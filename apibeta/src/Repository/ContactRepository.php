@@ -2,25 +2,25 @@
 
 namespace App\Repository;
 
-use App\Entity\Canditature;
+use App\Entity\Contact;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
- * @method Canditature|null find($id, $lockMode = null, $lockVersion = null)
- * @method Canditature|null findOneBy(array $criteria, array $orderBy = null)
- * @method Canditature[]    findAll()
- * @method Canditature[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Contact|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Contact|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Contact[]    findAll()
+ * @method Contact[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CanditatureRepository extends ServiceEntityRepository
+class ContactRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Canditature::class);
+        parent::__construct($registry, Contact::class);
     }
 
     // /**
-    //  * @return Canditature[] Returns an array of Canditature objects
+    //  * @return Contact[] Returns an array of Contact objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class CanditatureRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Canditature
+    public function findOneBySomeField($value): ?Contact
     {
         return $this->createQueryBuilder('c')
             ->andWhere('c.exampleField = :val')
