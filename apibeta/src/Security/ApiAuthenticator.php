@@ -2,52 +2,70 @@
 
 namespace App\Security;
 
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class ApiAuthenticator extends AbstractGuardAuthenticator
 {
+    public function __construct(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+    
+    
     public function supports(Request $request)
     {
-        // todo
+        return true;
     }
 
     public function getCredentials(Request $request)
     {
-        // todo
+       if ($request->headers->get('X-AUTH-TOKEN')==null || empty($request->headers->get('X-AUTH-TOKEN')))
+       {
+           return false;
+       } else {
+           return [
+               'apitoken' => $request->headers->get('X-AUTH-TOKEN'),
+           ];
+       }
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        // todo
+        $get_token = $this->userRepository->findOneBy([
+            'token' => $credentials['apitoken'],
+        ]);
+        return $get_token;
     }
 
     public function checkCredentials($credentials, UserInterface $user)
     {
-        // todo
+        return true;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        // todo
+        return new Response("Pas les droits !", 401);
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        // todo
+        return null;
     }
 
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        // todo
+        
     }
 
     public function supportsRememberMe()
     {
-        // todo
+        return false;
     }
 }
