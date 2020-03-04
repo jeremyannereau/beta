@@ -6,7 +6,7 @@ security:
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         # used to reload user from session & other features (e.g. switch_user)
-        app_user_provider:
+        in_database:
             entity:
                 class: App\Entity\User
                 property: email
@@ -14,20 +14,19 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        login:
+            pattern: ^/api/conn
+            stateless: true
+            anonymous: true
+            json_login:
+                username_path: email
+                check_path: /api/connect
         api:
             pattern: ^/api
             stateless: true
             guard:
                 authenticators:
                   - App\Security\ApiAuthenticator
-        login:
-            pattern: ^/api/connect
-            stateless: true
-            anonymous: true
-            json_login:
-                username_path: email
-                password_path: password
-                check_path: /api/connect
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication

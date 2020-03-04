@@ -13,10 +13,12 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class ApiAuthenticator extends AbstractGuardAuthenticator
 {
+    private $userRepository;
+
     public function __construct(UserRepository $userRepository)
     {
         $this->userRepository = $userRepository;
-        dd($this->userRepository);
+        
     }
     
     
@@ -32,7 +34,7 @@ class ApiAuthenticator extends AbstractGuardAuthenticator
            return false;
        } else {
            return [
-               'apitoken' => $request->headers->get('X-AUTH-TOKEN'),
+               'apiToken' => $request->headers->get('X-AUTH-TOKEN'),
            ];
        }
     }
@@ -40,7 +42,7 @@ class ApiAuthenticator extends AbstractGuardAuthenticator
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         $get_token = $this->userRepository->findOneBy([
-            'token' => $credentials['apitoken'],
+            'token' => $credentials['apiToken'],
         ]);
         return $get_token;
     }
