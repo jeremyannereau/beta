@@ -15,18 +15,18 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         api:
-            pattern: ^/admin
+            pattern: ^/api
             stateless: true
             guard:
                 authenticators:
                   - App\Security\ApiAuthenticator
         login:
-            pattern: ^/admin/connect
+            pattern: ^/api/connect
             stateless: true
             anonymous: true
             json_login:
-                username_path: Email
-                password_path: Password
+                username_path: email
+                password_path: password
                 check_path: /api/connect
 
             # activate different ways to authenticate

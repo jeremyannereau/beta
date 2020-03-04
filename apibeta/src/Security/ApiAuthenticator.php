@@ -16,6 +16,7 @@ class ApiAuthenticator extends AbstractGuardAuthenticator
     public function __construct(UserRepository $userRepository)
     {
         $this->userRepository = $userRepository;
+        dd($this->userRepository);
     }
     
     
