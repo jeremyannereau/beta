@@ -30,11 +30,12 @@ class UserController extends AbstractController
     }
 
      /**
-     * @Route("api/connect", name="connect_users", methods={"POST"})
+     * @Route("api/connect", name="connect_users", methods={"POST","GET"})
      */
-    public function api_connect(EntityManagerInterface $manager, Request $request, UserRepository $repository,SerializerInterface $serializer) 
+    public function api_connect(EntityManagerInterface $manager) 
     {
         $user=$this->getUser();
+        
         $utility = new ApiFunctions;
         
         $apiToken = $utility->genererToken($user);
