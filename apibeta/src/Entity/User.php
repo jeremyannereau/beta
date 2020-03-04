@@ -36,16 +36,6 @@ class User implements UserInterface
     private $password;
 
     /**
-<<<<<<< HEAD
-     * @ORM\OneToMany(targetEntity="App\Entity\Candidature", mappedBy="id_user")
-     */
-    private $candidatures;
-
-    public function __construct()
-    {
-        $this->candidatures = new ArrayCollection();
-    }
-=======
      * @ORM\Column(type="string", length=255)
      */
     private $name;
@@ -69,7 +59,6 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $token;
->>>>>>> 92173dd86ceb91a9bd7b5b1cca3f0a82c4828916
 
     public function getId(): ?int
     {
