@@ -8,12 +8,34 @@ use Symfony\Component\Routing\Annotation\Route;
 class ContactController extends AbstractController
 {
     /**
-     * @Route("/contact", name="contact")
+     * @Route("/contact/creer_contact", name="creer_contact")
      */
-    public function index()
+    public function creer_contact()
     {
-        return $this->render('contact/index.html.twig', [
-            'controller_name' => 'ContactController',
-        ]);
+        
+    }
+
+    /**
+     * @Route("/contact/modifier_contact", name="modifier_contact")
+     */
+    public function modifier_contact()
+    {
+        
+    }
+
+    /**
+     * @Route("/contact/consulter_contact", name="consulter_contact")
+     */
+    public function consulter_contact()
+    {
+        
+    }
+
+    /**
+     * @Route("/contact/supprimer_contact", name="supprimer_contact")
+     */
+    public function supprimer_contact()
+    {
+        
     }
 }
