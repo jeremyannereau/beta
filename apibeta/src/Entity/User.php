@@ -36,6 +36,7 @@ class User implements UserInterface
     private $password;
 
     /**
+<<<<<<< HEAD
      * @ORM\OneToMany(targetEntity="App\Entity\Candidature", mappedBy="id_user")
      */
     private $candidatures;
@@ -44,6 +45,31 @@ class User implements UserInterface
     {
         $this->candidatures = new ArrayCollection();
     }
+=======
+     * @ORM\Column(type="string", length=255)
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $firstname;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $phone;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $plainpassword;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $token;
+>>>>>>> 92173dd86ceb91a9bd7b5b1cca3f0a82c4828916
 
     public function getId(): ?int
     {
@@ -123,6 +149,7 @@ class User implements UserInterface
         // $this->plainPassword = null;
     }
 
+<<<<<<< HEAD
     /**
      * @return Collection|Candidature[]
      */
@@ -137,10 +164,21 @@ class User implements UserInterface
             $this->candidatures[] = $candidature;
             $candidature->setIdUser($this);
         }
+=======
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+>>>>>>> 92173dd86ceb91a9bd7b5b1cca3f0a82c4828916
 
         return $this;
     }
 
+<<<<<<< HEAD
     public function removeCandidature(Candidature $candidature): self
     {
         if ($this->candidatures->contains($candidature)) {
@@ -150,6 +188,52 @@ class User implements UserInterface
                 $candidature->setIdUser(null);
             }
         }
+=======
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
+
+    public function setFirstname(string $firstname): self
+    {
+        $this->firstname = $firstname;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(string $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getPlainpassword(): ?string
+    {
+        return $this->plainpassword;
+    }
+
+    public function setPlainpassword(string $plainpassword): self
+    {
+        $this->plainpassword = $plainpassword;
+
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(?string $token): self
+    {
+        $this->token = $token;
+>>>>>>> 92173dd86ceb91a9bd7b5b1cca3f0a82c4828916
 
         return $this;
     }
