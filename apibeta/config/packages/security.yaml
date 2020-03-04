@@ -11,19 +11,15 @@ security:
                 class: App\Entity\User
                 property: email
     firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
         login:
-            pattern: ^/api/conn
             stateless: true
-            anonymous: true
+            anonymous: lazy
             json_login:
-                username_path: email
-                check_path: /api/connect
+                check_path: connect_users
         api:
             pattern: ^/api
             stateless: true
+            anonymous: lazy
             guard:
                 authenticators:
                   - App\Security\ApiAuthenticator

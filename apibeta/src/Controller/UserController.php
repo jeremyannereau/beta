@@ -30,7 +30,7 @@ class UserController extends AbstractController
     }
 
      /**
-     * @Route("api/connect", name="connect_users", methods={"POST","GET"})
+     * @Route("/api/connect", name="connect_users", methods={"POST","GET"})
      */
     public function api_connect(EntityManagerInterface $manager) 
     {
