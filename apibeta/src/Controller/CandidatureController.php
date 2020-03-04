@@ -8,12 +8,37 @@ use Symfony\Component\Routing\Annotation\Route;
 class CandidatureController extends AbstractController
 {
     /**
-     * @Route("/candidature", name="candidature")
+     * @Route("/candidature/creer_candidature", name="creer_candidature")
      */
-    public function index()
+    public function creer_candidature()
     {
-        return $this->render('candidature/index.html.twig', [
-            'controller_name' => 'CandidatureController',
-        ]);
+       
     }
+
+    /**
+     * @Route("/candidature/consulter_candidature", name="consulter_candidature")
+     */
+    public function consulter_candidature()
+    {
+       
+    }
+
+    /**
+     * @Route("/candidature/modifier_candidature", name="modifier_candidature")
+     */
+    public function modifier_candidature()
+    {
+       
+    }
+
+    /**
+     * @Route("/candidature/supprimer_candidature", name="supprimer_candidature")
+     */
+    public function supprimer_candidature()
+    {
+       
+    }
+
+
+
 }
