@@ -138,22 +138,6 @@ class User implements UserInterface
         // $this->plainPassword = null;
     }
 
-<<<<<<< HEAD
-    /**
-     * @return Collection|Candidature[]
-     */
-    public function getCandidatures(): Collection
-    {
-        return $this->candidatures;
-    }
-
-    public function addCandidature(Candidature $candidature): self
-    {
-        if (!$this->candidatures->contains($candidature)) {
-            $this->candidatures[] = $candidature;
-            $candidature->setIdUser($this);
-        }
-=======
     public function getName(): ?string
     {
         return $this->name;
@@ -162,22 +146,10 @@ class User implements UserInterface
     public function setName(string $name): self
     {
         $this->name = $name;
->>>>>>> 92173dd86ceb91a9bd7b5b1cca3f0a82c4828916
 
         return $this;
     }
 
-<<<<<<< HEAD
-    public function removeCandidature(Candidature $candidature): self
-    {
-        if ($this->candidatures->contains($candidature)) {
-            $this->candidatures->removeElement($candidature);
-            // set the owning side to null (unless already changed)
-            if ($candidature->getIdUser() === $this) {
-                $candidature->setIdUser(null);
-            }
-        }
-=======
     public function getFirstname(): ?string
     {
         return $this->firstname;
@@ -222,7 +194,6 @@ class User implements UserInterface
     public function setToken(?string $token): self
     {
         $this->token = $token;
->>>>>>> 92173dd86ceb91a9bd7b5b1cca3f0a82c4828916
 
         return $this;
     }
