@@ -1,7 +1,7 @@
 security:
     encoders:
         App\Entity\User:
-            algorithm: auto
+            algorithm: plaintext
 
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
@@ -14,12 +14,20 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        main:
-            anonymous: lazy
-            provider: app_user_provider
+        api:
+            pattern: ^/admin
+            stateless: true
             guard:
                 authenticators:
-                    - App\Security\ApiAuthenticator
+                  - App\Security\ApiAuthenticator
+        login:
+            pattern: ^/admin/connect
+            stateless: true
+            anonymous: true
+            json_login:
+                username_path: Email
+                password_path: Password
+                check_path: /api/connect
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
