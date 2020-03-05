@@ -51,8 +51,8 @@ class UserController extends AbstractController
        
         $user = $serializer->deserialize($data,User::class,'json');
         
-        $haspass= $encoder->encodePassword($user,$user->getPlainPassword());
-        $user->setPassword($haspass);
+        $hashpass= $encoder->encodePassword($user,$user->getPlainPassword());
+        $user->setPassword($hashpass);
         
         
         //gestion des erreurs de validation
