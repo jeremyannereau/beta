@@ -87,9 +87,9 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/edit", name="edit_user", methods={"POST"})
+     * @Route("/api/modifier", name="modifier_user", methods={"POST"})
      */
-    public function edit_user(Request $request)
+    public function modifier_user(Request $request)
     {
         $data = $request->getContent();
 
@@ -109,7 +109,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/admin/valider_user", name="valider_user", methods={"POST"})
+     * @Route("/admin/valider/user", name="valider_user", methods={"POST"})
      */
     public function valider_user(Request $request,$role="Apprenant")
     {
@@ -128,9 +128,27 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/admin/supprimer_user", name="supprimer_user", methods={"POST"})
+     * @Route("/admin/supprimer/user", name="supprimer_user", methods={"POST"})
      */
     public function supprimer_user(Request $request)
+    {
+        $data = $request->getContent();
+        $user = $this->serializer->deserialize($data,User::class,'json');
+        $email=$user->getEmail();
+        $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
+        
+        $this->manager->remove($new_user);
+
+        $this->manager->flush();
+        
+        
+        return new JsonResponse("User supprimé",Response::HTTP_OK,[],'json');   
+    }
+
+    /**
+     * @Route("/admin/consulter/user", name="consulter_user", methods={"POST"})
+     */
+    public function consulter_user(Request $request)
     {
         $data = $request->getContent();
         $user = $this->serializer->deserialize($data,User::class,'json');
