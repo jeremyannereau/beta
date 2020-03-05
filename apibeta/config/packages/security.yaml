@@ -11,11 +11,12 @@ security:
                 class: App\Entity\User
                 property: email
     firewalls:
+        
         login:
             stateless: true
             anonymous: lazy
             json_login:
-                check_path: connect_users
+                check_path: connect_user
         api:
             pattern: ^/api
             stateless: true
@@ -28,7 +29,7 @@ security:
             # https://symfony.com/doc/current/security.html#firewalls-authentication
 
             # https://symfony.com/doc/current/security/impersonating_user.html
-            switch_user: true
+            # switch_user: true
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used

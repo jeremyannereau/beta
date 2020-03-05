@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\UserRepository;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AdminController extends AbstractController
 {
@@ -126,6 +129,21 @@ class AdminController extends AbstractController
     public function consulter_board()
     {
        
+    }
+
+     /**
+     * @Route("/admin/list", name="list_users", methods={"GET"})
+     */
+    public function index(UserRepository $repository,SerializerInterface $serializer) 
+    {
+        $elements = $repository->findAll();
+        $resultat = $serializer->serialize(
+            $elements,
+            'json',
+            [
+            ]
+        );
+        return new JsonResponse($resultat,200,[],true);
     }
 
    

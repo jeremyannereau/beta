@@ -18,6 +18,7 @@ class ApiAuthenticator extends AbstractGuardAuthenticator
     public function __construct(UserRepository $userRepository)
     {
         $this->userRepository = $userRepository;
+        
     }
     
     
@@ -41,7 +42,7 @@ class ApiAuthenticator extends AbstractGuardAuthenticator
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         $get_token = $this->userRepository->findOneBy([
-            'token' => $credentials['apiToken'],
+            'token' => $credentials['apitoken'],
         ]);
         return $get_token;
     }
