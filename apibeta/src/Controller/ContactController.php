@@ -39,12 +39,40 @@ class ContactController extends AbstractController
     }
 
     /**
-     * @Route("/contact/modifier_contact", name="modifier_contact")
+     * @Route("/contact/edit_contact", name="edit_contact")
      */
-    public function modifier_contact()
+    public function edit_contact(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer)
     {
+        $data = $request->getContent();
         
+
+      
+        $contact = $serializer->deserialize($data,Contact::class,'json');
+
+        
+        $id=$contact->getId();
+       
+
+        $pre_contact=$manager->getRepository(Contact::class)->findOneBy(array("id"=>$id));
+        
+       
+        $pre_contact=$pre_contact->setNom($contact->getNom());
+
+        $pre_contact=$pre_contact->setprenom($contact->getprenom());
+
+        $pre_contact=$pre_contact->setTelephone($contact->getTelephone());    
+        
+        $pre_contact=$pre_contact->setposte($contact->getposte());
+
+        $pre_contact=$pre_contact->setemail($contact->getemail());
+
+        
+        $manager->flush();
+
+        return new JsonResponse("modifié",Response::HTTP_OK,[],'json');  
+       dd($contact);
     }
+
 
     /**
      * @Route("/contact/consulter_contact", name="consulter_contact")

@@ -52,6 +52,12 @@ class Formation
     {
         $this->id_user = new ArrayCollection();
     }
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
 
     public function getId(): ?int
     {

@@ -38,11 +38,39 @@ class FormationController extends AbstractController
     }
 
     /**
-     * @Route("/formation/modifier_formation", name="modifier_formation")
+     * @Route("/formation/edit_formation", name="edit_formation")
      */
-    public function modifier_formation()
+    
+    public function edit_formation(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer)
     {
+        $data = $request->getContent();
         
+
+      
+        $formation = $serializer->deserialize($data,Formation::class,'json');
+
+        
+        $id=$formation->getId();
+       
+
+        $pre_formation=$manager->getRepository(Formation::class)->findOneBy(array("id"=>$id));
+        
+       
+        $pre_formation=$pre_formation->setNom($formation->getNom());
+
+        $pre_formation=$pre_formation->setStatut($formation->getStatut());
+
+        $pre_formation=$pre_formation->setTags($formation->getTags());    
+        
+        $pre_formation=$pre_formation->setDateDebut($formation->getDateDebut());
+
+        $pre_formation=$pre_formation->setDateFin($formation->getDateFin());
+
+        
+        $manager->flush();
+
+        return new JsonResponse("modifié",Response::HTTP_OK,[],'json');  
+       
     }
 
      /**

@@ -42,12 +42,33 @@ class EntrepriseController extends AbstractController
     
 
      /**
-     * @Route("/entreprise/modifier_entreprise", name="modifier_entreprise")
+     * @Route("/entreprise/edit_entreprise", name="edit_entreprise")
      */
-    public function modifier_entreprise()
+    public function edit_entreprise(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer)
     {
+        $data = $request->getContent();
+
       
+        $entreprise = $serializer->deserialize($data,Entreprise::class,'json');
+        $id=$entreprise->getId();
+     
+
+        $pre_entreprise=$manager->getRepository(Entreprise::class)->findOneBy(array("id"=>$id));
+        
+       
+        $pre_entreprise=$pre_entreprise->setnom($entreprise->getnom());
+
+        $pre_entreprise=$pre_entreprise->setTelephone($entreprise->getTelephone());    
+        
+        $pre_entreprise=$pre_entreprise->setadresse($entreprise->getadresse());
+        
+        $manager->flush();
+
+        return new JsonResponse("modifié",Response::HTTP_OK,[],'json');  
+       
     }
+
+
 
     /**
      * @Route("/entreprise/consulter_entreprise", name="consulter_entreprise")
