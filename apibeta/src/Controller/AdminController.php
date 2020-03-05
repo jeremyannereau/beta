@@ -2,28 +2,38 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Controller\UserController;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-class AdminController extends AbstractController
+
+class AdminController extends UserController
 {
     /**
      * @Route("/admin/creer_formateur", name="creer_formateur")
      */
-    public function creer_formateur()
+    public function creer_formateur(Request $request)
     {
-       
+        $this->register_user($request);
+        $this->valider_user($request,"formateur");
+        return new JsonResponse("Formateur inscrit et validé",Response::HTTP_OK,[],'json');
     }
 
     /**
-     * @Route("/admin/supprimer_formateur", name="supprimer_formateur")
+     * @Route("/admin/supprimer_user", name="supprimer_user")
      */
-    public function supprimer_formateur()
+    public function supprimer_user(Request $request)
     {
-       
+       return $this->supprimer_user($request);
     }
 
     /**
@@ -31,15 +41,15 @@ class AdminController extends AbstractController
      */
     public function consulter_formateur()
     {
-       
+        
     }
 
      /**
      * @Route("/admin/valider_formateur", name="valider_formateur")
      */
-    public function valider_formateur()
+    public function valider_formateur(Request $request)
     {
-       
+        return $this->valider_user($request,"formateur");
     }
 
      /**
@@ -51,19 +61,21 @@ class AdminController extends AbstractController
     }
 
      /**
-     * @Route("/admin/valider_apprenant", name="valider_apprenant")
+     * @Route("/formateur/valider_apprenant", name="valider_apprenant", methods={"POST"})
      */
-    public function valider_apprenant()
+    public function valider_apprenant(Request $request)
     {
-       
+        return $this-> valider_user($request,"apprenant");
     }
 
     /**
      * @Route("/admin/creer_apprenant", name="creer_apprenant")
      */
-    public function creer_apprenant()
+    public function creer_apprenant(Request $request)
     {
-       
+       $this->register_user($request);
+       $this->valider_user($request,"apprenant");
+       return new JsonResponse("Apprenant inscrit et validé",Response::HTTP_OK,[],'json');
     }
 
     /**
@@ -85,9 +97,9 @@ class AdminController extends AbstractController
     /**
      * @Route("/admin/modifier_apprenant", name="modifier_apprenant")
      */
-    public function modifier_apprenant()
+    public function modifier_apprenant(Request $request)
     {
-       
+       return $this->edit_user($request);
     }
 
      /**
