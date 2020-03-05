@@ -24,10 +24,10 @@ security:
                 authenticators:
                   - App\Security\ApiAuthenticator
 
-            activate different ways to authenticate
-            https://symfony.com/doc/current/security.html#firewalls-authentication
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
 
-            https://symfony.com/doc/current/security/impersonating_user.html
+            # https://symfony.com/doc/current/security/impersonating_user.html
             switch_user: true
 
     # Easy way to control access for large sections of your site
