@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class UserController extends AbstractController
 {
     /**
-     * @Route("api/list", name="list_users", methods={"POST"})
+     * @Route("api/list", name="list_users", methods={"GET"})
      */
     public function index(UserRepository $repository,SerializerInterface $serializer) 
     {
@@ -49,4 +49,6 @@ class UserController extends AbstractController
             
         ]);
     }
+
+    public function api_register(){}
 }
