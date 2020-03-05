@@ -32,7 +32,7 @@ class CandidatureController extends AbstractController
           $manager->flush();
           return new JsonResponse("ajouté",Response::HTTP_CREATED,[
           ],true); 
-          dd($candidature);   
+             
               
       
 
