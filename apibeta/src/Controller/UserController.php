@@ -72,39 +72,23 @@ class UserController extends AbstractController
     /**
      * @Route("/api/edit", name="edit_user", methods={"POST"})
      */
-    public function edit_user(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $encoder)
+    public function edit_user(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer, UserPasswordEncoderInterface $encoder)
     {
         $data = $request->getContent();
+
         $user = $serializer->deserialize($data,User::class,'json');
+
         $email=$user->getEmail();
-        $pre_user=$manager->getRepository(User::class)->findOneBy(array("email"=>$email));
         
+        $pre_user=$manager->getRepository(User::class)->findOneBy(array("email"=>$email));
        
+        $pre_user=$pre_user->setPassword($encoder->encodePassword($pre_user,$user->getPlainPassword()));
 
-        $pre_user->setPassword($encoder->encodePassword($pre_user,$user->getPlainPassword()));
-
+        $pre_user=$pre_user->setPhone($user->getPhone());      
+        
         $manager->flush();
 
-        return new JsonResponse("modifié",Response::HTTP_OK,[],'json');
-
-
-
-        // $hashpass= $encoder->encodePassword($user,$user->getPlainPassword());
-        // $user->setPassword($hashpass);
-        // $user->setPlainPassword("");
-        
-        // //gestion des erreurs de validation
-        // $errors =  $validator->validate($user);
-        // if(count($errors)){
-        //     $errorJson = $serializer->serialize($errors,'json');
-        //     return new JsonResponse($errorJson,Response::HTTP_BAD_REQUEST,[],true);
-
-        // }else{
-        //     $manager->persist($user);
-        //     $manager->flush();
-        //     return new JsonResponse("ajouté",Response::HTTP_CREATED,[
-        //     ],true);            
-        // }
+        return new JsonResponse("modifié",Response::HTTP_OK,[],'json');        
     }
 
 }
