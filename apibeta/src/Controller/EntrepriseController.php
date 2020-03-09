@@ -81,8 +81,25 @@ class EntrepriseController extends AbstractController
     /**
      * @Route("/entreprise/supprimer_entreprise", name="supprimer_entreprise")
      */
-    public function supprimer_entreprise()
+
+    public function supprimer_entreprise(Request $request)
     {
-      
+        $data = $request->getContent();
+        $entreprise = $this->serializer->deserialize($data,Entreprise::class,'json');
+        $id=$entreprise->getId();
+        $new_entreprise=$this->manager->getRepository(Entreprise::class,'json')->findOneBy(array("id"=>$id));
+        if ($new_entreprise){
+
+            
+            $this->manager->remove($new_entreprise);
+
+            $this->manager->flush();
+            
+            
+            return new JsonResponse("Entreprise supprimé",Response::HTTP_OK,[],'json');  
+        }else{
+            return new JsonResponse("Entreprise inexistant",Response::HTTP_OK,[],'json');
+        }
+         
     }
 }

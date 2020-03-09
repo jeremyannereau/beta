@@ -84,10 +84,27 @@ class FormationController extends AbstractController
      /**
      * @Route("/formation/supprimer_formation", name="supprimer_formation")
      */
-    public function supprimer_formation()
+    
+    public function supprimer_formation(Request $request)
     {
-        
-    }
+        $data = $request->getContent();
+        $formation = $this->serializer->deserialize($data,Formation::class,'json');
+        $id=$formation->getId();
+        $new_formation=$this->manager->getRepository(Formation::class,'json')->findOneBy(array("id"=>$id));
+        if ($new_formation){
+
+            
+            $this->manager->remove($new_formation);
+
+            $this->manager->flush();
+            
+            
+            return new JsonResponse("Formation supprimé",Response::HTTP_OK,[],'json');  
+        }
+        else{
+            return new JsonResponse("Formation inexistant",Response::HTTP_OK,[],'json');
+        }
 
 
+}
 }
