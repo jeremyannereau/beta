@@ -56,9 +56,24 @@ class CandidatureController extends AbstractController
     /**
      * @Route("/candidature/supprimer_candidature", name="supprimer_candidature")
      */
-    public function supprimer_candidature()
+
+    public function supprimer_candidature(Request $request)
     {
-       
+        $data = $request->getContent();
+        $candidature = $this->serializer->deserialize($data,Candidature::class,'json');
+        $id=$candidature->getId();
+        $new_candidature=$this->manager->getRepository(Candidature::class,'json')->findOneBy(array("id"=>$id));
+        if ($new_candidature){
+            $this->manager->remove($new_candidature);
+
+            $this->manager->flush();
+            
+            
+            return new JsonResponse("Candidature supprimé",Response::HTTP_OK,[],'json');  
+        }else{
+            return new JsonResponse("Candidature inexistant",Response::HTTP_OK,[],'json');
+        }
+         
     }
 
 

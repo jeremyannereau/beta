@@ -2,8 +2,12 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Formation;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class FormateurController extends AbstractController
 {
@@ -26,9 +30,26 @@ class FormateurController extends AbstractController
      /**
      * @Route("/formateur/ supprimer_groupe", name=" supprimer_groupe")
      */
-    public function supprimer_groupe()
+    public function supprimer_groupe(Request $request)
     {
-     
+        $data = $request->getContent();
+        $groupe = $this->serializer->deserialize($data,Formation::class,'json');
+        $id=$groupe->getId();
+        $new_groupe=$this->manager->getRepository(Formation::class,'json')->findOneBy(array("id"=>$id));
+        if ($new_groupe){
+
+            
+            $this->manager->remove($new_groupe);
+
+            $this->manager->flush();
+            
+            
+            return new JsonResponse("Groupe supprimé",Response::HTTP_OK,[],'json');  
+        }
+        else{
+            return new JsonResponse("Groupe inexistant",Response::HTTP_OK,[],'json');
+        }
+         
     }
 
     /**

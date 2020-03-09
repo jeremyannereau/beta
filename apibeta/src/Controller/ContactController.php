@@ -85,8 +85,23 @@ class ContactController extends AbstractController
     /**
      * @Route("/contact/supprimer_contact", name="supprimer_contact")
      */
-    public function supprimer_contact()
+
+    public function supprimer_contact(Request $request)
     {
-        
+        $data = $request->getContent();
+        $contact = $this->serializer->deserialize($data,Contact::class,'json');
+        $id=$contact->getId();
+        $new_contact=$this->manager->getRepository(Contact::class,'json')->findOneBy(array("id"=>$id));
+        if ($new_contact){
+            $this->manager->remove($new_contact);
+
+            $this->manager->flush();
+            
+            
+            return new JsonResponse("Contact supprimé",Response::HTTP_OK,[],'json');  
+        }else{
+            return new JsonResponse("Contact inexistant",Response::HTTP_OK,[],'json');
+        }
+         
     }
 }
