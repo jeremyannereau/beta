@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
 class ApiAuthenticator extends AbstractGuardAuthenticator
 {
@@ -31,7 +32,9 @@ class ApiAuthenticator extends AbstractGuardAuthenticator
     {
        if ($request->headers->get('X-AUTH-TOKEN')==null || empty($request->headers->get('X-AUTH-TOKEN')))
        {
-           return false;
+          return false;
+           
+        
        } else {
            return [
                'apiToken' => $request->headers->get('X-AUTH-TOKEN'),
@@ -54,7 +57,7 @@ class ApiAuthenticator extends AbstractGuardAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        return new Response("Pas les droits !", 401);
+        return new Response("Vous n'avez pas les droits !", 401);
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
