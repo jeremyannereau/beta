@@ -156,10 +156,10 @@ class UserController extends AbstractController
 
         $token = $request->headers->get('X-AUTH-TOKEN');
         $demandeur=$this->manager->getRepository(User::class,'json')->findOneBy(array("token"=>$token));
-        dd($demandeur);
+        
         if ($role == "apprenant"){
  
-            if ($demandeur == null | $demandeur->getStatut()!= ("admin" | "formateur")){
+            if ($demandeur == null | $demandeur->getStatut()!= ("admin" && "formateur")){
                 return new JsonResponse("Vous n'avez pas les droits d'accès1",Response::HTTP_UNAUTHORIZED,[],'json'); 
             }else{
                 $data = $request->getContent();
@@ -195,16 +195,15 @@ class UserController extends AbstractController
                 }
             }
         }else{
-            return new JsonResponse("Aucune validation nécessaire",Response::HTTP_BAD_REQUEST,[],'json'); 
+            return new JsonResponse("Aucune validation possible",Response::HTTP_BAD_REQUEST,[],'json'); 
         }
     }
 
     /**
      * @Route("/admin/supprimer/user", name="supprimer_user", methods={"POST"})
      */
-    public function supprimer_user(Request $request)
+    public function admin_supprimer_user(Request $request)
     {
-
         $token = $request->headers->get('X-AUTH-TOKEN');
         $demandeur=$this->manager->getRepository(User::class,'json')->findOneBy(array("token"=>$token));
         
@@ -212,26 +211,24 @@ class UserController extends AbstractController
             return new JsonResponse("Vous n'avez pas les droits d'accès",Response::HTTP_UNAUTHORIZED,[],'json'); 
         }else{
 
-
-        $data = $request->getContent();
-        $user = $this->serializer->deserialize($data,User::class,'json');
-        $email=$user->getEmail();
-        $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
-        if ($new_user){
-            $this->manager->remove($new_user);
-            $this->manager->flush();             
-            return new JsonResponse("User supprimé",Response::HTTP_OK,[],'json');  
-        }else{
-            return new JsonResponse("User inexistant",Response::HTTP_OK,[],'json');
-        }
-         
+            $data = $request->getContent();
+            $user = $this->serializer->deserialize($data,User::class,'json');
+            $email=$user->getEmail();
+            $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
+            if ($new_user){
+                $this->manager->remove($new_user);
+                $this->manager->flush();             
+                return new JsonResponse("User supprimé",Response::HTTP_OK,[],'json');  
+            }else{
+                return new JsonResponse("User inexistant",Response::HTTP_OK,[],'json');
+            }  
         }
     }
 
     /**
      * @Route("/admin/consulter/user", name="consulter_user", methods={"POST"})
      */
-    public function consulter_user(Request $request)
+    public function admin_consulter_user(Request $request)
 
     {
 
@@ -240,10 +237,7 @@ class UserController extends AbstractController
         $user = $this->serializer->deserialize($data,User::class,'json');
         $email=$user->getEmail();
         $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
-        
-        $this->manager->remove($new_user);
-
-        $this->manager->flush();
+       
         
         
         return new JsonResponse("User supprimé",Response::HTTP_OK,[],'json');   
