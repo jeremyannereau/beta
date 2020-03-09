@@ -39,24 +39,34 @@ class UserController extends AbstractController
      */
     public function api_connect(Request $request) 
     {
+        //Si erreur d'identifiant, l'Authenticator le gère en réponse 400
         $user=$this->getUser();
-        // Si validé par un formateur ou admin
-        if (!($user->getStatut()=="inactif")){
-
-            $utility = new ApiFunctions;
-            $apiToken = $utility->genererToken($user);
-            
-            $user->setToken($apiToken); // je set un token au user
-            
-            $this->manager->flush($user);       // j'update le token du user
-
-            return new JsonResponse([
-                'token' => $apiToken
-            ]);
-        // Si non, pas token 
+        
+        // Si le header de la requête ne spécifie pas le format JSON
+        if ($user==null){
+            return new JsonResponse("Format de la requête incorrecte, format JSON demandé",Response::HTTP_BAD_REQUEST,[],'json');
         }else{
-            return new JsonResponse("Attente activation",Response::HTTP_BAD_REQUEST,[],'json');
-        }
+
+            // Si déja validé par un formateur ou un admin
+            if (($user->getStatut()=="apprenant" | $user->getStatut()=="formateur" | $user->getStatut()=="admin" )){
+
+                $utility = new ApiFunctions;
+
+                $apiToken = $utility->genererToken($user);
+                
+                $user->setToken($apiToken); // je set un token au user
+                
+                $this->manager->flush($user);       // j'update le token du user
+
+                return new JsonResponse([
+                    'token' => $apiToken
+                ]);
+
+            // Si non = statut "inactif" en bdd ou bien erreur de bdd, pas de token renvoyé
+            }else{
+                return new JsonResponse("En attente d'activation",Response::HTTP_BAD_REQUEST,[],'json');
+            }
+        }    
     }
 
     /**
@@ -138,10 +148,7 @@ class UserController extends AbstractController
         $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
         if ($new_user){
             $this->manager->remove($new_user);
-
-            $this->manager->flush();
-            
-            
+            $this->manager->flush();             
             return new JsonResponse("User supprimé",Response::HTTP_OK,[],'json');  
         }else{
             return new JsonResponse("User inexistant",Response::HTTP_OK,[],'json');
