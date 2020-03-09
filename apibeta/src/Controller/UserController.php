@@ -136,20 +136,27 @@ class UserController extends AbstractController
         $user = $this->serializer->deserialize($data,User::class,'json');
         $email=$user->getEmail();
         $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
-        
-        $this->manager->remove($new_user);
+        if ($new_user){
+            $this->manager->remove($new_user);
 
-        $this->manager->flush();
-        
-        
-        return new JsonResponse("User supprimé",Response::HTTP_OK,[],'json');   
+            $this->manager->flush();
+            
+            
+            return new JsonResponse("User supprimé",Response::HTTP_OK,[],'json');  
+        }else{
+            return new JsonResponse("User inexistant",Response::HTTP_OK,[],'json');
+        }
+         
     }
 
     /**
      * @Route("/admin/consulter/user", name="consulter_user", methods={"POST"})
      */
     public function consulter_user(Request $request)
+
     {
+
+        //a faire
         $data = $request->getContent();
         $user = $this->serializer->deserialize($data,User::class,'json');
         $email=$user->getEmail();
