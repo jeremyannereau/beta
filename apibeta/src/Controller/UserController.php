@@ -232,19 +232,25 @@ class UserController extends AbstractController
         $token = $request->headers->get('X-AUTH-TOKEN');
         $demandeur=$this->manager->getRepository(User::class,'json')->findOneBy(array("token"=>$token));
         
-        
         if ($demandeur == null | $demandeur->getStatut()!=("admin" && "formateur")){
             return new JsonResponse("Vous n'avez pas les droits d'accès",Response::HTTP_UNAUTHORIZED,[],'json'); 
         }else{
             $data = $request->getContent();
             $user = $this->serializer->deserialize($data,User::class,'json');
+            
             $email=$user->getEmail();
+            $user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
             $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
+            if ($new_user==null){
+                return new JsonResponse("Demande invalide",Response::HTTP_BAD_REQUEST,[],'json');    
+            }   
             $role = $new_user->getStatut();
-            if ()
-            $new_user=$this->serializer->serialize($new_user,'json',["groups"=>"user_profile"]);
-        
-        return new JsonResponse($new_user,Response::HTTP_OK,[],'json');   
+            if (($role == "formateur" && $demandeur->getStatut()!=("admin") && ($new_user->getId()!=$user->getId()))){
+                return new JsonResponse("Accès non autorisé",Response::HTTP_FORBIDDEN,[],'json');    
+            }else{
+                $new_user=$this->serializer->serialize($new_user,'json',["groups"=>"user_profile"]);
+                return new JsonResponse($new_user,Response::HTTP_OK,[],'json');    
+            }
         }
     }
 }
