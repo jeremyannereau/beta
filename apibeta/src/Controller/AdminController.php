@@ -23,22 +23,22 @@ class AdminController extends UserController
      */
     public function valider_formateur(Request $request)
     {
-        return $this->valider_user($request,"formateur");
+        return $this->admin_valider_user($request,"formateur");
     }
     /**
      * @Route("/admin/valider/apprenant", name="valider_apprenant", methods={"POST"})
      */
     public function valider_apprenant(Request $request)
     {
-        return $this-> valider_user($request,"apprenant");
+        return $this-> admin_valider_user($request,"apprenant");
     }
     /**
      * @Route("/admin/creer/formateur", name="creer_formateur", methods={"POST"})
      */
-    public function creer_formateur(Request $request)
+    public function creer_formateur(Request $request,$roles=array("ROLE_FORMATEUR","ROLE_APPRENANT"))
     {
-        $this->register_user($request);
-        $this->valider_user($request,"formateur");
+        $this->api_register($request,$roles);
+        $this->admin_valider_user($request,"formateur");
         return new JsonResponse("Formateur inscrit et validé",Response::HTTP_OK,[],'json');
     }
     /**
@@ -46,8 +46,8 @@ class AdminController extends UserController
      */
     public function creer_apprenant(Request $request)
     {
-       $this->register_user($request);
-       $this->valider_user($request,"apprenant");
+       $this->api_register($request);
+       $this->admin_valider_user($request,"apprenant");
        return new JsonResponse("Apprenant inscrit et validé",Response::HTTP_OK,[],'json');
     }
     
