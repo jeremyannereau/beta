@@ -210,7 +210,6 @@ class UserController extends AbstractController
         if ($demandeur == null | $demandeur->getStatut()!="admin"){
             return new JsonResponse("Vous n'avez pas les droits d'accès",Response::HTTP_UNAUTHORIZED,[],'json'); 
         }else{
-
             $data = $request->getContent();
             $user = $this->serializer->deserialize($data,User::class,'json');
             $email=$user->getEmail();
@@ -229,17 +228,23 @@ class UserController extends AbstractController
      * @Route("/admin/consulter/user", name="consulter_user", methods={"POST"})
      */
     public function admin_consulter_user(Request $request)
-
     {
-
-        //a faire
-        $data = $request->getContent();
-        $user = $this->serializer->deserialize($data,User::class,'json');
-        $email=$user->getEmail();
-        $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
-       
+        $token = $request->headers->get('X-AUTH-TOKEN');
+        $demandeur=$this->manager->getRepository(User::class,'json')->findOneBy(array("token"=>$token));
         
         
-        return new JsonResponse("User supprimé",Response::HTTP_OK,[],'json');   
+        if ($demandeur == null | $demandeur->getStatut()!=("admin" && "formateur")){
+            return new JsonResponse("Vous n'avez pas les droits d'accès",Response::HTTP_UNAUTHORIZED,[],'json'); 
+        }else{
+            $data = $request->getContent();
+            $user = $this->serializer->deserialize($data,User::class,'json');
+            $email=$user->getEmail();
+            $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
+            $role = $new_user->getStatut();
+            if ()
+            $new_user=$this->serializer->serialize($new_user,'json',["groups"=>"user_profile"]);
+        
+        return new JsonResponse($new_user,Response::HTTP_OK,[],'json');   
+        }
     }
 }

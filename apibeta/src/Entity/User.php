@@ -22,6 +22,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Groups({"user_profile"})
      */
     private $email;
 
@@ -39,17 +40,19 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user_profile"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user_profile"})
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"User_secure", "group2"})
+     * @Groups({"User_secure", "user_profile"})
      */
     private $phone;
 
@@ -66,6 +69,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user_profile"})
      */
     private $statut;
 
