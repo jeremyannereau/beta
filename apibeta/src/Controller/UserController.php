@@ -156,11 +156,11 @@ class UserController extends AbstractController
 
         $token = $request->headers->get('X-AUTH-TOKEN');
         $demandeur=$this->manager->getRepository(User::class,'json')->findOneBy(array("token"=>$token));
-
+        dd($demandeur);
         if ($role == "apprenant"){
  
             if ($demandeur == null | $demandeur->getStatut()!= ("admin" | "formateur")){
-                return new JsonResponse("Vous n'avez pas les droits d'accès",Response::HTTP_UNAUTHORIZED,[],'json'); 
+                return new JsonResponse("Vous n'avez pas les droits d'accès1",Response::HTTP_UNAUTHORIZED,[],'json'); 
             }else{
                 $data = $request->getContent();
                 $user = $this->serializer->deserialize($data,User::class,'json'); 
@@ -177,8 +177,9 @@ class UserController extends AbstractController
                 }
             }
         }else if ($role =="formateur"){
+
             if ($demandeur->getStatut()!= ("admin")){
-                return new JsonResponse("Vous n'avez pas les droits d'accès",Response::HTTP_UNAUTHORIZED,[],'json'); 
+                return new JsonResponse("Vous n'avez pas les droits d'accès2",Response::HTTP_UNAUTHORIZED,[],'json'); 
             }else{
                 $data = $request->getContent();
                 $user = $this->serializer->deserialize($data,User::class,'json'); 
@@ -224,6 +225,7 @@ class UserController extends AbstractController
             return new JsonResponse("User inexistant",Response::HTTP_OK,[],'json');
         }
          
+        }
     }
 
     /**
