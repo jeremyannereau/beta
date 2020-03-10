@@ -63,11 +63,11 @@ class UserController extends AbstractController
      * @Route("/api/register", name="register_user", methods={"POST"})
      */
     public function register_user(Request $request)
-    {
-        $data = $request->getContent();
-        
+    {   // on recupere le contenu
+        $data = $request->getContent(); 
+        // on passe en objet le contenu
         $user = $this->serializer->deserialize($data,User::class,'json');
-
+        // ?
         $hashpass= $this->encoder->encodePassword($user,$user->getPlainPassword());
         $user->setPassword($hashpass);
         $user->setStatut("inactif");
@@ -96,7 +96,7 @@ class UserController extends AbstractController
         $user = $this->serializer->deserialize($data,User::class,'json');
 
         $email=$user->getEmail();
-
+        //recherche user par email
         $pre_user=$this->manager->getRepository(User::class)->findOneBy(array("email"=>$email));
        
         $pre_user=$pre_user->setPassword($this->encoder->encodePassword($pre_user,$user->getPlainPassword()));
