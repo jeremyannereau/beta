@@ -9,7 +9,6 @@ use App\Utilities\ApiFunctions;
 use Doctrine\DBAL\DBALException;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Driver\PDOException;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +17,9 @@ use Symfony\Component\Validator\Constraints\Json;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
@@ -111,6 +112,10 @@ class UserController extends AbstractController
         catch(NotNormalizableValueException $e){
             return new JsonResponse (json_encode($e->getMessage()),Response::HTTP_BAD_REQUEST,[],true);
         }  
+        //Si le format de données n'est pas bon, par ex: integer au lieu de string
+        catch(NotEncodableValueException $e){
+            return new JsonResponse (json_encode($e->getMessage()),Response::HTTP_BAD_REQUEST,[],true);
+        }
     }
 
     /**
@@ -121,21 +126,15 @@ class UserController extends AbstractController
         try{
             $data = $request->getContent();
             $user = $this->serializer->deserialize($data,User::class,'json');
-            $email=$user->getEmail();
-            $pre_user=$this->manager->getRepository(User::class)->findOneBy(array("email"=>$email));
+            $token=$request->headers->get("X-AUTH-CONTENT");
+            $pre_user=$this->manager->getRepository(User::class)->findOneBy(array("token"=>$token));
             
             if (($pre_user)!=null){
-                $token = $request->headers->get('X-AUTH-TOKEN');
                 
-                if ($token != $pre_user->getToken()){
-                    return new JsonResponse("Erreur d'authentification",Response::HTTP_UNAUTHORIZED,[],'json'); 
-                }else{
-
                 $pre_user=$pre_user->setPassword($this->encoder->encodePassword($pre_user,$user->getPlainPassword()));
                 $pre_user=$pre_user->setPhone($user->getPhone());      
                 $this->manager->flush();
                 return new JsonResponse("Utilisateur modifié",Response::HTTP_OK,[],'json'); 
-                }
             }else{
                 // Si l'utilisateur n'existe pas, renvoi un message Json
                 return new JsonResponse("Utilisateur inexistant",Response::HTTP_BAD_REQUEST,[],'json');
@@ -229,28 +228,49 @@ class UserController extends AbstractController
      */
     public function admin_consulter_user(Request $request)
     {
-        $token = $request->headers->get('X-AUTH-TOKEN');
-        $demandeur=$this->manager->getRepository(User::class,'json')->findOneBy(array("token"=>$token));
-        
-        if ($demandeur == null | $demandeur->getStatut()!=("admin" && "formateur")){
-            return new JsonResponse("Vous n'avez pas les droits d'accès",Response::HTTP_UNAUTHORIZED,[],'json'); 
-        }else{
-            $data = $request->getContent();
-            $user = $this->serializer->deserialize($data,User::class,'json');
+        try{
+       
+            $token = $request->headers->get('X-AUTH-TOKEN');
+            $demandeur=$this->manager->getRepository(User::class,'json')->findOneBy(array("token"=>$token));
             
-            $email=$user->getEmail();
-            $user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
-            $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
-            if ($new_user==null){
-                return new JsonResponse("Demande invalide",Response::HTTP_BAD_REQUEST,[],'json');    
-            }   
-            $role = $new_user->getStatut();
-            if (($role == "formateur" && $demandeur->getStatut()!=("admin") && ($new_user->getId()!=$user->getId()))){
-                return new JsonResponse("Accès non autorisé",Response::HTTP_FORBIDDEN,[],'json');    
+            if ($demandeur == null){
+                return new JsonResponse("Vous n'avez pas les droits d'accès",Response::HTTP_UNAUTHORIZED,[],'json'); 
+          
+            }else if($demandeur->getStatut()!=("admin" && "formateur")){
+
+                return new JsonResponse("Vous n'avez pas les droits d'accès",Response::HTTP_UNAUTHORIZED,[],'json'); 
+            
             }else{
-                $new_user=$this->serializer->serialize($new_user,'json',["groups"=>"user_profile"]);
-                return new JsonResponse($new_user,Response::HTTP_OK,[],'json');    
+                $data = $request->getContent();
+                $user = $this->serializer->deserialize($data,User::class,'json');
+                
+                $email=$user->getEmail();
+                $user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
+                $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
+               
+                
+                if ($new_user==null){
+                    return new JsonResponse("Demande invalide",Response::HTTP_BAD_REQUEST,[],'json');    
+                }   
+                $role = $new_user->getStatut();
+
+
+                if (($role == "formateur" && $demandeur->getStatut()!=("admin") && ($new_user->getId()!=$user->getId()))){
+                    return new JsonResponse("Accès non autorisé",Response::HTTP_FORBIDDEN,[],'json');    
+                }else{
+                    $new_user=$this->serializer->serialize($new_user,'json',["groups"=>"user_profile"]);
+                    return new JsonResponse($new_user,Response::HTTP_OK,[],'json');    
+                }
             }
+        }
+    
+        //Si le format de données n'est pas bon, par ex: integer au lieu de string
+        catch(NotNormalizableValueException $e){
+            return new JsonResponse (json_encode($e->getMessage()),Response::HTTP_BAD_REQUEST,[],true);
+        }  
+        //Si le format de données n'est pas bon, par ex: integer au lieu de string
+        catch(NotEncodableValueException $e){
+            return new JsonResponse (json_encode($e->getMessage()),Response::HTTP_BAD_REQUEST,[],true);
         }
     }
 }
