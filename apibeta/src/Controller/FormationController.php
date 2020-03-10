@@ -11,9 +11,25 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class FormationController extends AbstractController
 {
+    protected $manager;
+    
+    protected $serializer;
+    protected $validator;
+    protected $encoder;
+
+    public function __construct(EntityManagerInterface $manager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $encoder)
+    {
+        
+        $this->manager = $manager;
+        $this->serializer = $serializer;
+        $this->validator = $validator;
+        $this->encoder = $encoder;
+    }
+
     /**
      * @Route("/formation/creer_formation", name="creer_formation")
      */

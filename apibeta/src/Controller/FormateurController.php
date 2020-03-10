@@ -3,14 +3,32 @@
 namespace App\Controller;
 
 use App\Entity\Formation;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class FormateurController extends AbstractController
 {
+    protected $manager;
+    
+    protected $serializer;
+    protected $validator;
+    protected $encoder;
+
+    public function __construct(EntityManagerInterface $manager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $encoder)
+    {
+        
+        $this->manager = $manager;
+        $this->serializer = $serializer;
+        $this->validator = $validator;
+        $this->encoder = $encoder;
+    }
     /**
      * @Route("/formateur/creer_groupe", name="creer_groupe")
      */
@@ -28,7 +46,7 @@ class FormateurController extends AbstractController
     }
 
      /**
-     * @Route("/formateur/ supprimer_groupe", name=" supprimer_groupe")
+     * @Route("/formateur/supprimer/groupe", name=" supprimer_groupe")
      */
     public function supprimer_groupe(Request $request)
     {
