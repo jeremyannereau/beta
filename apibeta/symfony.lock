@@ -1,4 +1,10 @@
 {
+    "deployer/deployer": {
+        "version": "v6.7.3"
+    },
+    "deployer/phar-update": {
+        "version": "v2.2.0"
+    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {
@@ -116,6 +122,9 @@
     },
     "phpdocumentor/type-resolver": {
         "version": "1.1.0"
+    },
+    "pimple/pimple": {
+        "version": "v3.3.0"
     },
     "psr/cache": {
         "version": "1.0.1"

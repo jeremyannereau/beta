@@ -2,8 +2,12 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Candidature;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ApprenantController extends AbstractController
 {
@@ -42,10 +46,28 @@ class ApprenantController extends AbstractController
     /**
      * @Route("/apprenant/supprimer_candidature", name="supprimer_candidature")
      */
-    public function supprimer_candidature()
-    {   
-      
-    }
+    public function supprimer_candidature(Request $request)
+    {
+        $data = $request->getContent();
+        $candidature = $this->serializer->deserialize($data,Candidature::class,'json');
+        $id=$candidature->getId();
+        $new_candidature=$this->manager->getRepository(Candidature::class,'json')->findOneBy(array("id"=>$id));
+        if ($new_candidature){
+
+            
+            $this->manager->remove($new_candidature);
+
+            $this->manager->flush();
+            
+            
+            return new JsonResponse("Candidature supprimé",Response::HTTP_OK,[],'json');  
+        }
+        else{
+            return new JsonResponse("Candidature inexistant",Response::HTTP_OK,[],'json');
+        }
+
+
+}
 
     /**
      * @Route("/apprenant/afficher_profil", name="afficher_profil")
