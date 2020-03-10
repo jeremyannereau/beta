@@ -37,7 +37,7 @@ class AdminController extends UserController
      */
     public function creer_formateur(Request $request,$roles=array("ROLE_FORMATEUR","ROLE_APPRENANT"))
     {
-        $this->api_register($request,$roles);
+        $this->register($request,$roles);
         $this->admin_valider_user($request,"formateur");
         return new JsonResponse("Formateur inscrit et validé",Response::HTTP_OK,[],'json');
     }
@@ -46,20 +46,12 @@ class AdminController extends UserController
      */
     public function creer_apprenant(Request $request)
     {
-       $this->api_register($request);
+       $this->register($request);
        $this->admin_valider_user($request,"apprenant");
        return new JsonResponse("Apprenant inscrit et validé",Response::HTTP_OK,[],'json');
     }
     
-
     
-    /**
-     * @Route("/admin/supprimer/user", name="supprimer_user")
-     */
-    public function supprimer_user(Request $request)
-    {
-       return $this->supprimer_user($request);
-    }
     /**
      * @Route("/admin/consulter/user", name="consulter_user")
      */
@@ -116,18 +108,25 @@ class AdminController extends UserController
     }
 
      /**
-     * @Route("/admin/list", name="list_users", methods={"GET"})
+     * @Route("/admin/list", name="list_users", methods={"POST"})
      */
-    public function index(UserRepository $repository,SerializerInterface $serializer) 
+    public function index(Request $request, UserRepository $repository,SerializerInterface $serializer) 
     {
-        $elements = $repository->findAll();
-        $resultat = $serializer->serialize(
-            $elements,
-            'json',
-            [
-            ]
-        );
-        return new JsonResponse($resultat,200,[],true);
+        $token = $request->headers->get('X-AUTH-TOKEN');
+        $demandeur=$this->manager->getRepository(User::class,'json')->findOneBy(array("token"=>$token));
+        
+        if ($demandeur == null | $demandeur->getStatut()!=("admin")){
+            return new JsonResponse("Vous n'avez pas les droits d'accès",Response::HTTP_UNAUTHORIZED,[],'json'); 
+        }else{
+
+            $elements = $repository->findAll();
+            $resultat = $serializer->serialize(
+                $elements,
+                'json',
+                ["groups"=>"user_profile"]
+            );
+            return new JsonResponse($resultat,200,[],true);
+        }
     }
 
    
