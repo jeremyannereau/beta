@@ -75,9 +75,9 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/register", name="register_user", methods={"POST"})
+     * @Route("register", name="register_user", methods={"POST"})
      */
-    public function api_register(Request $request,array $roles=array("ROLE_APPRENANT"))
+    public function register(Request $request,array $roles=array("ROLE_APPRENANT"))
     {
         try{
             $data = $request->getContent();
