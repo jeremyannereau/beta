@@ -12,23 +12,48 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-
+use App\Repository\EntrepriseRepository;
 class EntrepriseController extends AbstractController
 {
-    protected $manager;
-    
-    protected $serializer;
-    protected $validator;
-    protected $encoder;
 
-    public function __construct(EntityManagerInterface $manager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $encoder)
-    {
-        
-        $this->manager = $manager;
-        $this->serializer = $serializer;
-        $this->validator = $validator;
-        $this->encoder = $encoder;
+ 
+    /**
+     * @Route("/entreprise/lister", name="lister_entreprise")
+     */
+    public function lister_entreprise (EntityManagerInterface $manager, SerializerInterface $serializer){
+
+        $entreprises = $manager->getRepository(Entreprise::class)->findAll();
+        $entreprises = $serializer->serialize($entreprises,'json');
+        return new JsonResponse($entreprises,Response::HTTP_OK,[],true);
     }
+
+    /**
+     * @Route("/entreprise/rechercher", name="rechercher_entreprise")
+     */
+    public function rechercher_entreprise (EntityManagerInterface $manager, SerializerInterface $serializer, Request $request, EntrepriseRepository $repository){
+        
+            $data=$request->getContent();
+            $recherche = $serializer->deserialize($data,Entreprise::class,"json");
+            
+            $nom = $recherche->getNom();
+           
+            $entreprises = $repository->findByNom($nom);
+            $entreprises = $serializer->serialize($entreprises,'json');
+            return new JsonResponse(($entreprises),Response::HTTP_OK,[],true); 
+          
+
+        
+
+        
+
+
+    }
+
+
+
+
+
+
     /**
      * @Route("/entreprise/creer_entreprise", name="creer_entreprise")
      */

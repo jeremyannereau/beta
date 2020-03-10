@@ -152,50 +152,59 @@ class UserController extends AbstractController
     public function admin_valider_user(Request $request,$role="apprenant")
     {   
         //Vérif des droits suffisants à la validation d'un apprenant
-
-        $token = $request->headers->get('X-AUTH-TOKEN');
-        $demandeur=$this->manager->getRepository(User::class,'json')->findOneBy(array("token"=>$token));
-        
-        if ($role == "apprenant"){
- 
-            if ($demandeur == null | $demandeur->getStatut()!= ("admin" && "formateur")){
-                return new JsonResponse("Vous n'avez pas les droits d'accès1",Response::HTTP_UNAUTHORIZED,[],'json'); 
-            }else{
-                $data = $request->getContent();
-                $user = $this->serializer->deserialize($data,User::class,'json'); 
-                $email=$user->getEmail();
-                $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
-
-                if($new_user!=null){
-                    //Validation du User   
-                    $new_user=$new_user->setStatut($role);
-                    $this->manager->flush();
-                    return new JsonResponse($role . " validé",Response::HTTP_OK,[],'json');
+        try{
+            $token = $request->headers->get('X-AUTH-TOKEN');
+            $demandeur=$this->manager->getRepository(User::class,'json')->findOneBy(array("token"=>$token));
+            
+            if ($role == "apprenant"){
+    
+                if ($demandeur == null | $demandeur->getStatut()!= ("admin" && "formateur")){
+                    return new JsonResponse("Vous n'avez pas les droits d'accès1",Response::HTTP_UNAUTHORIZED,[],'json'); 
                 }else{
-                    return new JsonResponse("Utilisateur inexistant",Response::HTTP_BAD_REQUEST,[],'json');
-                }
-            }
-        }else if ($role =="formateur"){
+                    $data = $request->getContent();
+                    $user = $this->serializer->deserialize($data,User::class,'json'); 
+                    $email=$user->getEmail();
+                    $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
 
-            if ($demandeur->getStatut()!= ("admin")){
-                return new JsonResponse("Vous n'avez pas les droits d'accès2",Response::HTTP_UNAUTHORIZED,[],'json'); 
-            }else{
-                $data = $request->getContent();
-                $user = $this->serializer->deserialize($data,User::class,'json'); 
-                $email=$user->getEmail();
-                $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
-                if($new_user!=null){
-                    //Validation du User   
-                    $new_user=$new_user->setStatut($role);
-                    $this->manager->flush();
-                    return new JsonResponse($role ." validé",Response::HTTP_OK,[],'json');
-                }else{
-                    return new JsonResponse("Utilisateur inexistant",Response::HTTP_BAD_REQUEST,[],'json');
+                    if($new_user!=null){
+                        //Validation du User   
+                        $new_user=$new_user->setStatut($role);
+                        $this->manager->flush();
+                        return new JsonResponse($role . " validé",Response::HTTP_OK,[],'json');
+                    }else{
+                        return new JsonResponse("Utilisateur inexistant",Response::HTTP_BAD_REQUEST,[],'json');
+                    }
                 }
+            }else if ($role =="formateur"){
+
+                if ($demandeur->getStatut()!= ("admin")){
+                    return new JsonResponse("Vous n'avez pas les droits d'accès2",Response::HTTP_UNAUTHORIZED,[],'json'); 
+                }else{
+                    $data = $request->getContent();
+                    $user = $this->serializer->deserialize($data,User::class,'json'); 
+                    $email=$user->getEmail();
+                    $new_user=$this->manager->getRepository(User::class,'json')->findOneBy(array("email"=>$email));
+                    if($new_user!=null){
+                        //Validation du User   
+                        $new_user=$new_user->setStatut($role);
+                        $this->manager->flush();
+                        return new JsonResponse($role ." validé",Response::HTTP_OK,[],'json');
+                    }else{
+                        return new JsonResponse("Utilisateur inexistant",Response::HTTP_BAD_REQUEST,[],'json');
+                    }
+                }
+            }else{
+                return new JsonResponse("Aucune validation possible",Response::HTTP_BAD_REQUEST,[],'json'); 
             }
-        }else{
-            return new JsonResponse("Aucune validation possible",Response::HTTP_BAD_REQUEST,[],'json'); 
+        }//Si le format de données n'est pas bon, par ex: integer au lieu de string
+        catch(NotNormalizableValueException $e){
+            return new JsonResponse (json_encode($e->getMessage()),Response::HTTP_BAD_REQUEST,[],true);
+        }  
+        //Si le format de données n'est pas bon, par ex: integer au lieu de string
+        catch(NotEncodableValueException $e){
+            return new JsonResponse (json_encode($e->getMessage()),Response::HTTP_BAD_REQUEST,[],true);
         }
+
     }
 
     /**
