@@ -14,6 +14,37 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class EntrepriseController extends AbstractController
 {
+
+ 
+    /**
+     * @Route("/entreprise/lister", name="lister_entreprise")
+     */
+    public function lister_entreprise (EntityManagerInterface $manager, SerializerInterface $serializer){
+
+        $entreprises = $manager->getRepository(Entreprise::class)->findAll();
+        $entreprises = $serializer->serialize($entreprises,'json');
+        return new JsonResponse($entreprises,Response::HTTP_OK,[],true);
+    }
+
+    /**
+     * @Route("/entreprise/rechercher", name="rechercher_entreprise")
+     */
+    public function rechercher_entreprise (EntityManagerInterface $manager, SerializerInterface $serializer, Request $request){
+        
+            $data=$request->getContent();
+
+        
+
+        
+
+
+    }
+
+
+
+
+
+
     /**
      * @Route("/entreprise/creer_entreprise", name="creer_entreprise")
      */
