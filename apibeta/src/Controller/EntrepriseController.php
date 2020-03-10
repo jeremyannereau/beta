@@ -35,11 +35,18 @@ class EntrepriseController extends AbstractController
             $data=$request->getContent();
             $recherche = $serializer->deserialize($data,Entreprise::class,"json");
             
-            $nom = $recherche->getNom();
+            if ($nom = $recherche->getNom()){
+
+                $nom = $recherche->getNom();
+
+                $entreprises = $repository->findByNom($nom);
+
+                $entreprises = $serializer->serialize($entreprises,'json');
+
+                return new JsonResponse(($entreprises),Response::HTTP_OK,[],true);
+            }
            
-            $entreprises = $repository->findByNom($nom);
-            $entreprises = $serializer->serialize($entreprises,'json');
-            return new JsonResponse(($entreprises),Response::HTTP_OK,[],true); 
+            
           
 
         
