@@ -14,6 +14,7 @@ use Symfony\Component\Mime\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface as EncoderEncoderInterface;
 
 class CandidatureController extends AbstractController
