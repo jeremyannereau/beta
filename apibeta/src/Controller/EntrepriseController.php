@@ -57,7 +57,6 @@ class EntrepriseController extends AbstractController
         return new JsonResponse(json_encode($secteurs),Response::HTTP_OK,[],true);
 
     }
-
      /**
      * @Route("/entreprise/rechercher/departements", name="rechercher_departements")
      */
@@ -95,7 +94,6 @@ class EntrepriseController extends AbstractController
         $entreprises = $serializer->serialize($entreprises,'json');
 
         return new JsonResponse(($entreprises),Response::HTTP_OK,[],true);
-    
     }
 
     /**
@@ -158,7 +156,6 @@ class EntrepriseController extends AbstractController
         $new_entreprise=$this->serializer->serialize($new_entreprise,'json',[]);
 
         return new JsonResponse($new_entreprise,Response::HTTP_OK,[],'json');
-
     }
 
     /**

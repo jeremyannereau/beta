@@ -51,7 +51,7 @@ class CandidatureController extends AbstractController
         $candidature->setIdEntreprise($entreprise);
         $candidature->setIdUser($user);
 
-        dd($candidature);
+        
 
         //gestion des erreurs de validation
       $errors =  $validator->validate($candidature);
@@ -65,8 +65,7 @@ class CandidatureController extends AbstractController
           $manager->flush();
           return new JsonResponse("ajouté",Response::HTTP_CREATED,[
           ],true); 
- 
-        }
+    }
        
     }
 

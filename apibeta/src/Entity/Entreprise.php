@@ -189,7 +189,6 @@ class Entreprise
                 $contact->setIdEntreprise(null);
             }
         }
-
         return $this;
     }
 
