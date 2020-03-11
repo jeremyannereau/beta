@@ -16,13 +16,13 @@ class Entreprise
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"entreprise_candidature"})
+     * @Groups({"entreprise_candidature","nomansland"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"entreprise_candidature"})
+     * @Groups({"entreprise_candidature","nomansland"})
      */
     private $nom;
 
@@ -33,19 +33,19 @@ class Entreprise
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"entreprise_candidature"})
+     * @Groups({"entreprise_candidature","nomansland"})
      */
     private $secteur;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"entreprise_candidature"})
+     * @Groups({"entreprise_candidature","nomansland"})
      */
     private $adresse;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"entreprise_candidature"})
+     * @Groups({"entreprise_candidature","nomansland"})
      */
     private $telephone;
 
@@ -56,13 +56,13 @@ class Entreprise
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"entreprise_candidature"})
+     * @Groups({"entreprise_candidature","nomansland"})
      */
     private $departement;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"entreprise_candidature"})
+     * @Groups({"entreprise_candidature","nomansland"})
      */
     private $ville;
 

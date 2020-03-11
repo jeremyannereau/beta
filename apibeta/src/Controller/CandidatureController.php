@@ -67,16 +67,34 @@ class CandidatureController extends AbstractController
           return new JsonResponse("ajouté",Response::HTTP_CREATED,[
           ],true); 
  
-    }
+        }
        
     }
 
     /**
-     * @Route("/candidature/consulter_candidature", name="consulter_candidature")
+     * @Route("/candidature/consulter", name="consulter_candidature")
      */
-    public function consulter_candidature()
+    public function consulter_candidature(Request $request)
     {
-       
+        $data = $request->getContent();
+        
+        $candidature = $this->serializer->deserialize($data,Candidature::class,'json');
+     
+        $id=$candidature->getId();
+        
+        $new_candidature=$this->manager->getRepository(Candidature::class,'json')->findOneBy(array("id"=>$id));
+        $entreprise = $new_candidature->getIdEntreprise();
+        $user = $new_candidature->getIdUser();
+        
+        $entreprise=$this->manager->getRepository(Entreprise::class,'json')->findOneBy(array("id"=>$entreprise));
+        //dd($entreprise);
+        $user=$this->manager->getRepository(User::class,'json')->findOneBy(array("id"=>$user));
+        //dd($user);
+    
+        $new_candidature->setIdEntreprise($entreprise);
+        $new_candidature->setIdUser($user);
+        $new_candidature=$this->serializer->serialize($new_candidature,'json',['groups'=>'nomansland']);
+        return new JsonResponse($new_candidature,Response::HTTP_OK,[],'json');
     }
 
     /**

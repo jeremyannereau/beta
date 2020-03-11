@@ -102,13 +102,6 @@ class FormateurController extends AbstractController
      
     }
 
-    /**
-     * @Route("/formateur/consulter_candidature", name="consulter_candidature")
-     */
-    public function consulter_candidature()
-    {
-     
-    }
-
+   
 
 }

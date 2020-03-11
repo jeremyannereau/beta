@@ -17,12 +17,13 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"nomansland"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"user_profile"})
+     * @Groups({"user_profile", "nomansland"})
      */
     private $email;
 
@@ -40,13 +41,13 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_profile"})
+     * @Groups({"user_profile", "nomansland"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_profile"})
+     * @Groups({"user_profile","nomansland"})
      */
     private $firstname;
 

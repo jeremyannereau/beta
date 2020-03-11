@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CandidatureRepository")
@@ -13,35 +14,48 @@ class Candidature
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"nomansland"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="candidatures")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"nomansland"})
      */
     private $id_user;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Entreprise", inversedBy="candidatures")
-     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"nomansland"})
+     * @Groups({"nomansland"})
      */
     private $id_entreprise;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"nomansland"})
      */
     private $date_candidature;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"nomansland"})
      */
     private $reponse;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"nomansland"})
      */
     private $moyen_candidature;
+
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
 
     public function getId(): ?int
     {
