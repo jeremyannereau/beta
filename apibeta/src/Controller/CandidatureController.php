@@ -51,8 +51,6 @@ class CandidatureController extends AbstractController
         $candidature->setIdEntreprise($entreprise);
         $candidature->setIdUser($user);
 
-        
-
         //gestion des erreurs de validation
       $errors =  $validator->validate($candidature);
 
@@ -96,15 +94,25 @@ class CandidatureController extends AbstractController
     }
 
     /**
-     * @Route("/candidature/modifier_candidature", name="modifier_candidature")
+     * @Route("/candidature/modifier", name="modifier_candidature")
      */
-    public function modifier_candidature()
+    public function modifier_candidature(Request $request)
     {
+       $data=$request->getContent();
        
+       $candidature = $this->serializer->deserialize($data,Candidature::class,'json');
+       $id=$candidature->getId();
+    
+       $pre_candidature=$this->manager->getRepository(Candidature::class)->findOneBy(array("id"=>$id));
+      // dd($pre_candidature);
+       $pre_formation=$pre_candidature->setReponse($candidature->getReponse());
+       
+       $this->manager->flush();
+       return new JsonResponse("modifié",Response::HTTP_OK,[],'json');  
     }
 
     /**
-     * @Route("/candidature/supprimer_candidature", name="supprimer_candidature")
+     * @Route("/candidature/supprimer", name="supprimer_candidature")
      */
 
     public function supprimer_candidature(Request $request)
@@ -119,9 +127,9 @@ class CandidatureController extends AbstractController
             $this->manager->flush();
             
             
-            return new JsonResponse("Candidature supprimé",Response::HTTP_OK,[],'json');  
+            return new JsonResponse("Candidature supprimée",Response::HTTP_OK,[],'json');  
         }else{
-            return new JsonResponse("Candidature inexistant",Response::HTTP_OK,[],'json');
+            return new JsonResponse("Candidature inexistante",Response::HTTP_OK,[],'json');
         }
          
     }

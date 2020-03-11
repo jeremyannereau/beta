@@ -49,9 +49,9 @@ class FormationController extends AbstractController
         }
     }
     /**
-     * @Route("/formation/edit", name="edit_formation")
+     * @Route("/formation/modifier", name="modifier_formation")
      */
-    public function edit_formation(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer)
+    public function modifier_formation(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer)
     {
         $data = $request->getContent();
         $formation = $serializer->deserialize($data,Formation::class,'json');
