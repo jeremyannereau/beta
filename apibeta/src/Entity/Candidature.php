@@ -28,7 +28,6 @@ class Candidature
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Entreprise", inversedBy="candidatures")
      * @Groups({"nomansland"})
-     * @Groups({"nomansland"})
      */
     private $id_entreprise;
 

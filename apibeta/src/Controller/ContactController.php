@@ -12,9 +12,22 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class ContactController extends AbstractController
 {
+    protected $manager;
+    protected $serializer;
+    protected $validator;
+    protected $encoder;
+        
+    public function __construct(EntityManagerInterface $manager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $encoder)
+    {
+        $this->manager = $manager;
+        $this->serializer = $serializer;
+        $this->validator = $validator;
+        $this->encoder = $encoder;
+    }
     /**
      * @Route("/contact/creer", name="creer_contact")
      */
@@ -39,7 +52,7 @@ class ContactController extends AbstractController
         }
         }
     /**
-     * @Route("/contact/edit", name="edit_contact")
+     * @Route("/contact/modifier", name="edit_contact")
      */
     public function edit_contact(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer)
     {
@@ -57,11 +70,23 @@ class ContactController extends AbstractController
        dd($contact);
     }
     /**
-     * @Route("/contact/consulter_contact", name="consulter_contact")
+     * @Route("/contact/consulter", name="consulter_contact")
      */
-    public function consulter_contact()
+    public function consulter_contact(Request $request)
     {
+        $data = $request->getContent();
+        $contact = $this->serializer->deserialize($data,Contact::class,'json');
+        $id=$contact->getId();
+        $new_contact=$this->manager->getRepository(Contact::class,'json')->findOneBy(array("id"=>$id));
         
+        $entreprise = $new_contact->getIdEntreprise();
+        $entreprise=$this->manager->getRepository(Entreprise::class,'json')->findOneBy(array("id"=>$entreprise));
+        
+        $new_contact->setIdEntreprise($entreprise);
+       
+        $new_contact=$this->serializer->serialize($new_contact,'json',['groups'=>'contact']);
+       
+        return new JsonResponse($new_contact,Response::HTTP_OK,[],'json');
     }
     /**
      * @Route("/contact/supprimer_contact", name="supprimer_contact")

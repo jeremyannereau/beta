@@ -32,6 +32,27 @@ class CandidatureController extends AbstractController
         $this->encoder = $encoder;
     }
     
+     /**
+     * @Route("/candidatures/lister", name="lister_candidatures")
+     */
+    public function lister_candidature (){
+
+        $candidatures = $this->manager->getRepository(Candidature::class)->findAll();
+        $candidatures = $this->serializer->serialize($candidatures,'json',['groups'=>'nomansland']);
+        return new JsonResponse($candidatures,Response::HTTP_OK,[],true);
+    }
+     /**
+     * @Route("/candidatures/lister/id", name="lister_candidatures_id")
+     */
+    public function lister_cand (Request $request){
+        $data=$request->getContent();
+        $data=json_decode($data,true);
+     
+        $entreprises = $this->manager->getRepository(Candidature::class)->findBy(array("id_user"=>$data["id"]));
+        $entreprises = $this->serializer->serialize($entreprises,'json',['groups'=>'nomansland']);
+        return new JsonResponse($entreprises,Response::HTTP_OK,[],true);
+    }
+
     /**
      * @Route("/candidature/creer", name="creer_candidature")
      */
@@ -114,7 +135,6 @@ class CandidatureController extends AbstractController
     /**
      * @Route("/candidature/supprimer", name="supprimer_candidature")
      */
-
     public function supprimer_candidature(Request $request)
     {
         $data = $request->getContent();
@@ -123,10 +143,7 @@ class CandidatureController extends AbstractController
         $new_candidature=$this->manager->getRepository(Candidature::class,'json')->findOneBy(array("id"=>$id));
         if ($new_candidature){
             $this->manager->remove($new_candidature);
-
             $this->manager->flush();
-            
-            
             return new JsonResponse("Candidature supprimée",Response::HTTP_OK,[],'json');  
         }else{
             return new JsonResponse("Candidature inexistante",Response::HTTP_OK,[],'json');
