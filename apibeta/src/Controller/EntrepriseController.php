@@ -35,7 +35,7 @@ class EntrepriseController extends AbstractController
     public function lister_entreprise (EntityManagerInterface $manager, SerializerInterface $serializer){
 
         $entreprises = $manager->getRepository(Entreprise::class)->findAll();
-        $entreprises = $serializer->serialize($entreprises,'json',["Groups"=>"entreprise_candidature"]);
+        $entreprises = $serializer->serialize($entreprises,'json',['groups'=>'entreprise_candidature']);
         return new JsonResponse($entreprises,Response::HTTP_OK,[],true);
     }
     

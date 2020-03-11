@@ -48,9 +48,8 @@ class FormationController extends AbstractController
             ],true);   
         }
     }
-
     /**
-     * @Route("/formation/edit_formation", name="edit_formation")
+     * @Route("/formation/edit", name="edit_formation")
      */
     public function edit_formation(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer)
     {
@@ -66,10 +65,9 @@ class FormationController extends AbstractController
         $manager->flush();
         return new JsonResponse("modifié",Response::HTTP_OK,[],'json');    
     }
-
-     /**
-     * @Route("/formation/consulter_formation", name="consulter_formation")
-     */
+    /**
+    * @Route("/formation/consulter_formation", name="consulter_formation")
+    */
     public function consulter_formation()
     {
         
