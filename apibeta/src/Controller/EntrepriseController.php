@@ -16,7 +16,6 @@ use App\Repository\EntrepriseRepository;
 class EntrepriseController extends AbstractController
 {
     protected $manager;
-    
     protected $serializer;
     protected $validator;
     protected $encoder;
@@ -36,35 +35,47 @@ class EntrepriseController extends AbstractController
     public function lister_entreprise (EntityManagerInterface $manager, SerializerInterface $serializer){
 
         $entreprises = $manager->getRepository(Entreprise::class)->findAll();
-        $entreprises = $serializer->serialize($entreprises,'json');
+        $entreprises = $serializer->serialize($entreprises,'json',["Groups"=>"entreprise_candidature"]);
         return new JsonResponse($entreprises,Response::HTTP_OK,[],true);
     }
     
     /**
-     * @Route("/entreprise/rechercher", name="rechercher_entreprise")
+     * @Route("/entreprise/rechercher/secteurs", name="rechercher_secteurs")
      */
-    public function rechercher_entreprise(EntityManagerInterface $manager, SerializerInterface $serializer, Request $request, EntrepriseRepository $repository){
-        
+    public function rechercher_secteurs(EntityManagerInterface $manager, SerializerInterface $serializer, Request $request, EntrepriseRepository $repository){
+        //Renvoie les secteurs de la BDD
         $entreprises = $manager->getRepository(Entreprise::class)->findAll();
         
         $secteurs = [];
+       
+        foreach($entreprises as $entreprise){
+
+            if ($entreprise->getSecteur()!=""){
+                $secteurs[] = $entreprise->getSecteur();
+            } 
+        }
+        return new JsonResponse(json_encode($secteurs),Response::HTTP_OK,[],true);
+
+    }
+
+     /**
+     * @Route("/entreprise/rechercher/departements", name="rechercher_departements")
+     */
+    public function rechercher_departements(EntityManagerInterface $manager, SerializerInterface $serializer, Request $request, EntrepriseRepository $repository){
+        //Renvoie les départemnts de la BDD
+        $entreprises = $manager->getRepository(Entreprise::class)->findAll();
+        
         $departements = [];
 
         foreach($entreprises as $entreprise){
 
-            if ($entreprise->getSecteur()!=""){
-                $secteurs[$entreprise->getNom()] = $entreprise->getSecteur();
-            }
             if ($entreprise->getDepartement()!=""){
-                $departements[$entreprise->getNom()] = $entreprise->getDepartement();
+                $departements[] = $entreprise->getDepartement();
             }
-           
         }
-
-        return new JsonResponse("[" . json_encode($secteurs). ", " . json_encode($departements) . "]",Response::HTTP_OK,[],true);
+        return new JsonResponse(json_encode($departements),Response::HTTP_OK,[],true);
 
     }
-
     /**
      * @Route("/entreprise/rechercher/criteres", name="rechercher_entreprise_criteres")
      */
