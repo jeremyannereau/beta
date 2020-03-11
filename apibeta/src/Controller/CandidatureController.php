@@ -26,7 +26,6 @@ class CandidatureController extends AbstractController
         
     public function __construct(EntityManagerInterface $manager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $encoder)
     {
-        
         $this->manager = $manager;
         $this->serializer = $serializer;
         $this->validator = $validator;
