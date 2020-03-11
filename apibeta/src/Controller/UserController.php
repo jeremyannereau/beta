@@ -70,7 +70,7 @@ class UserController extends AbstractController
 
             // Si non = statut "inactif" en bdd ou bien erreur de bdd, pas de token renvoyé
             }else{
-                return new JsonResponse("En attente d'activation",Response::HTTP_BAD_REQUEST,[],'json');
+                return new JsonResponse("En attente d'activation",Response::HTTP_OK,[],'json');
             }
         }    
     }

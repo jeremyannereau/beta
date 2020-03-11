@@ -48,6 +48,16 @@ class Entreprise
      */
     private $contacts;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $departement;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $ville;
+
     public function __construct()
     {
         $this->candidatures = new ArrayCollection();
@@ -171,6 +181,30 @@ class Entreprise
                 $contact->setIdEntreprise(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDepartement(): ?string
+    {
+        return $this->departement;
+    }
+
+    public function setDepartement(string $departement): self
+    {
+        $this->departement = $departement;
+
+        return $this;
+    }
+
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+
+    public function setVille(string $ville): self
+    {
+        $this->ville = $ville;
 
         return $this;
     }

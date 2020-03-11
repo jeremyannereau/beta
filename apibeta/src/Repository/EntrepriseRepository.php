@@ -23,7 +23,7 @@ class EntrepriseRepository extends ServiceEntityRepository
       * @return Entreprise[] Returns an array of Entreprise objects
       */
     
-    public function findByNom($nom,$secteur,$departement,$ville)
+    public function findBySelect($nom=null,$secteur=null,$departement=null,$ville=null,$adresse=null)
     {
         $query = $this->createQueryBuilder('c');
         if ($nom){
@@ -32,7 +32,7 @@ class EntrepriseRepository extends ServiceEntityRepository
 
         }
         if ($secteur){
-            $query->andWhere('c.nom LIKE :secteur')
+            $query->andWhere('c.secteur LIKE :secteur')
             ->setParameter('secteur',$secteur );
 
         }
@@ -40,16 +40,22 @@ class EntrepriseRepository extends ServiceEntityRepository
             $query->andWhere('c.departement LIKE :departement')
             ->setParameter('departement',$departement );
         }
+        if ($adresse){
+            $query->andWhere('c.adresse LIKE :adresse')
+            ->setParameter('adresse','%'. $adresse . '%' );
+        }
         if ($ville){
             $query->andWhere('c.ville LIKE :ville')
-            ->setParameter('ville',$ville );
+            ->setParameter('ville','%'. $ville . '%' );
         }
 
-           $query->orderBy('c.id', 'ASC')
+           $query=$query->orderBy('c.id', 'ASC')
             ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
+            ->getQuery();
+            $query = $query->getResult();
         ;
+        return $query;
+        
     }
     
 

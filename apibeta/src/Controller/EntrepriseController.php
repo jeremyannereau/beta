@@ -15,8 +15,21 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Repository\EntrepriseRepository;
 class EntrepriseController extends AbstractController
 {
+    protected $manager;
+    
+    protected $serializer;
+    protected $validator;
+    protected $encoder;
+        
+    public function __construct(EntityManagerInterface $manager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $encoder)
+    {
+        
+        $this->manager = $manager;
+        $this->serializer = $serializer;
+        $this->validator = $validator;
+        $this->encoder = $encoder;
+    }
 
- 
     /**
      * @Route("/entreprise/lister", name="lister_entreprise")
      */
@@ -26,50 +39,62 @@ class EntrepriseController extends AbstractController
         $entreprises = $serializer->serialize($entreprises,'json');
         return new JsonResponse($entreprises,Response::HTTP_OK,[],true);
     }
-
+    
     /**
      * @Route("/entreprise/rechercher", name="rechercher_entreprise")
      */
-    public function rechercher_entreprise (EntityManagerInterface $manager, SerializerInterface $serializer, Request $request, EntrepriseRepository $repository){
+    public function rechercher_entreprise(EntityManagerInterface $manager, SerializerInterface $serializer, Request $request, EntrepriseRepository $repository){
         
-            $data=$request->getContent();
-            $recherche = $serializer->deserialize($data,Entreprise::class,"json");
-            
-            if ($nom = $recherche->getNom()){
+        $entreprises = $manager->getRepository(Entreprise::class)->findAll();
+        
+        $secteurs = [];
+        $departements = [];
 
-                $nom = $recherche->getNom();
+        foreach($entreprises as $entreprise){
 
-                $entreprises = $repository->findByNom($nom);
-
-                $entreprises = $serializer->serialize($entreprises,'json');
-
-                return new JsonResponse(($entreprises),Response::HTTP_OK,[],true);
+            if ($entreprise->getSecteur()!=""){
+                $secteurs[$entreprise->getNom()] = $entreprise->getSecteur();
+            }
+            if ($entreprise->getDepartement()!=""){
+                $departements[$entreprise->getNom()] = $entreprise->getDepartement();
             }
            
-            
-          
+        }
 
-        
-
-        
-
+        return new JsonResponse("[" . json_encode($secteurs). ", " . json_encode($departements) . "]",Response::HTTP_OK,[],true);
 
     }
 
+    /**
+     * @Route("/entreprise/rechercher/criteres", name="rechercher_entreprise_criteres")
+     */
+    public function rechercher_entreprise_criteres (EntityManagerInterface $manager, SerializerInterface $serializer, Request $request, EntrepriseRepository $repository){
+        
+        $data=$request->getContent();
+        $recherche = $serializer->deserialize($data,Entreprise::class,"json");
+        
+        $nom = $recherche->getNom();
+        $secteur=$recherche->getSecteur();
+        $departement=$recherche->getDepartement();
+        $ville=$recherche->getVille();
+        $adresse=$recherche->getAdresse();
+        
+        $entreprises = $repository->findBySelect($nom,$secteur,$departement,$ville,$adresse);
 
+        $entreprises = $serializer->serialize($entreprises,'json');
 
-
-
+        return new JsonResponse(($entreprises),Response::HTTP_OK,[],true);
+    
+    }
 
     /**
-     * @Route("/entreprise/creer_entreprise", name="creer_entreprise")
+     * @Route("/entreprise/creer", name="creer_entreprise")
      */
     public function creer_entreprise(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer, ValidatorInterface $validator )
     {
       $data=$request->getContent();
       $entreprise=$serializer->deserialize($data,Entreprise::class,"json");
     
-
       //gestion des erreurs de validation
       $errors =  $validator->validate($entreprise);
       if(count($errors)){
@@ -80,28 +105,22 @@ class EntrepriseController extends AbstractController
           $manager->persist($entreprise);
           $manager->flush();
           return new JsonResponse("ajouté",Response::HTTP_CREATED,[
-          ],true); 
-               
-      }
-        
-   
+          ],true);           
+      }   
     }
     
 
      /**
-     * @Route("/entreprise/edit_entreprise", name="edit_entreprise")
+     * @Route("/entreprise/edit", name="edit_entreprise")
      */
     public function edit_entreprise(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer)
     {
         $data = $request->getContent();
 
-      
         $entreprise = $serializer->deserialize($data,Entreprise::class,'json');
         $id=$entreprise->getId();
      
-
         $pre_entreprise=$manager->getRepository(Entreprise::class)->findOneBy(array("id"=>$id));
-        
        
         $pre_entreprise=$pre_entreprise->setnom($entreprise->getnom());
 
@@ -112,21 +131,27 @@ class EntrepriseController extends AbstractController
         $manager->flush();
 
         return new JsonResponse("modifié",Response::HTTP_OK,[],'json');  
-       
     }
 
 
 
     /**
-     * @Route("/entreprise/consulter_entreprise", name="consulter_entreprise")
+     * @Route("/entreprise/consulter", name="consulter_entreprise")
      */
-    public function consulter_entreprise()
+    public function consulter_entreprise(Request $request)
     {
-      
+        $data = $request->getContent();
+        $entreprise = $this->serializer->deserialize($data,Entreprise::class,'json');
+        $id=$entreprise->getId();
+        $new_entreprise=$this->manager->getRepository(Entreprise::class,'json')->findOneBy(array("id"=>$id));
+        $new_entreprise=$this->serializer->serialize($new_entreprise,'json',[]);
+
+        return new JsonResponse($new_entreprise,Response::HTTP_OK,[],'json');
+
     }
 
     /**
-     * @Route("/entreprise/supprimer/entreprise", name="supprimer_entreprise")
+     * @Route("/entreprise/supprimer", name="supprimer_entreprise")
      */
 
     public function supprimer_entreprise(Request $request)
@@ -136,17 +161,13 @@ class EntrepriseController extends AbstractController
         $id=$entreprise->getId();
         $new_entreprise=$this->manager->getRepository(Entreprise::class,'json')->findOneBy(array("id"=>$id));
         if ($new_entreprise){
-
-            
             $this->manager->remove($new_entreprise);
 
             $this->manager->flush();
             
-            
-            return new JsonResponse("Entreprise supprimé",Response::HTTP_OK,[],'json');  
+            return new JsonResponse("Entreprise supprimée",Response::HTTP_OK,[],'json');  
         }else{
-            return new JsonResponse("Entreprise inexistant",Response::HTTP_OK,[],'json');
+            return new JsonResponse("Entreprise inexistante",Response::HTTP_OK,[],'json');
         }
-         
     }
 }
