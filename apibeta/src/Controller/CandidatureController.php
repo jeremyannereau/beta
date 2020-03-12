@@ -35,20 +35,26 @@ class CandidatureController extends AbstractController
      /**
      * @Route("/candidatures/lister", name="lister_candidatures")
      */
-    public function lister_candidature (){
+    public function lister_candidature ()
+    {
 
         $candidatures = $this->manager->getRepository(Candidature::class)->findAll();
         $candidatures = $this->serializer->serialize($candidatures,'json',['groups'=>'nomansland']);
         return new JsonResponse($candidatures,Response::HTTP_OK,[],true);
     }
      /**
-     * @Route("/candidatures/lister/id", name="lister_candidatures_id")
+     * @Route("/candidatures/lister/token", name="lister_candidatures_token")
      */
     public function lister_cand (Request $request){
         $data=$request->getContent();
         $data=json_decode($data,true);
-     
-        $entreprises = $this->manager->getRepository(Candidature::class)->findBy(array("id_user"=>$data["id"]));
+        
+        $user=$this->manager->getRepository(User::class)->findBy(array("token"=>$data["token"]));
+        
+        $iduser=$user[0]->getId();
+        
+        $entreprises = $this->manager->getRepository(Candidature::class)->findBy(array("id_user"=>$iduser));
+        
         $entreprises = $this->serializer->serialize($entreprises,'json',['groups'=>'nomansland']);
         return new JsonResponse($entreprises,Response::HTTP_OK,[],true);
     }
@@ -57,7 +63,7 @@ class CandidatureController extends AbstractController
      * @Route("/candidature/creer", name="creer_candidature")
      */
     public function creer_candidature(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer,EncoderEncoderInterface $encoder, ValidatorInterface $validator)
-     { 
+    { 
         $data = $request->getContent();
         $candidature=$serializer->deserialize($data,Candidature::class,"json");
        
@@ -73,19 +79,17 @@ class CandidatureController extends AbstractController
         $candidature->setIdUser($user);
 
         //gestion des erreurs de validation
-      $errors =  $validator->validate($candidature);
+        $errors =  $validator->validate($candidature);
 
-      if(count($errors)){
-          $errorJson = $serializer->serialize($errors,'json');
-          return new JsonResponse($errorJson,Response::HTTP_BAD_REQUEST,[],true);
-
-      }else{
-          $manager->persist($candidature);
-          $manager->flush();
-          return new JsonResponse("ajouté",Response::HTTP_CREATED,[
-          ],true); 
-    }
-       
+        if(count($errors)){
+            $errorJson = $serializer->serialize($errors,'json');
+            return new JsonResponse($errorJson,Response::HTTP_BAD_REQUEST,[],true);
+        }else{
+            $manager->persist($candidature);
+            $manager->flush();
+            return new JsonResponse("ajouté",Response::HTTP_CREATED,[
+            ],true); 
+        }   
     }
 
     /**
@@ -147,10 +151,6 @@ class CandidatureController extends AbstractController
             return new JsonResponse("Candidature supprimée",Response::HTTP_OK,[],'json');  
         }else{
             return new JsonResponse("Candidature inexistante",Response::HTTP_OK,[],'json');
-        }
-         
+        }         
     }
-
-
-
 }

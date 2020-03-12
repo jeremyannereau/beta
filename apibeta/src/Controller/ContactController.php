@@ -78,18 +78,39 @@ class ContactController extends AbstractController
         $contact = $this->serializer->deserialize($data,Contact::class,'json');
         $id=$contact->getId();
         $new_contact=$this->manager->getRepository(Contact::class,'json')->findOneBy(array("id"=>$id));
+        if ($new_contact){
+            $entreprise = $new_contact->getIdEntreprise();
+            $entreprise=$this->manager->getRepository(Entreprise::class,'json')->findOneBy(array("id"=>$entreprise));
+            
+            $new_contact->setIdEntreprise($entreprise);
         
-        $entreprise = $new_contact->getIdEntreprise();
-        $entreprise=$this->manager->getRepository(Entreprise::class,'json')->findOneBy(array("id"=>$entreprise));
+            $new_contact=$this->serializer->serialize($new_contact,'json',['groups'=>'contact']);
+       
+            return new JsonResponse($new_contact,Response::HTTP_OK,[],'json');
+        }else{
+            return new JsonResponse("Erreur de contact");
+        }
         
-        $new_contact->setIdEntreprise($entreprise);
-       
-        $new_contact=$this->serializer->serialize($new_contact,'json',['groups'=>'contact']);
-       
-        return new JsonResponse($new_contact,Response::HTTP_OK,[],'json');
     }
     /**
-     * @Route("/contact/supprimer_contact", name="supprimer_contact")
+     * @Route("/contact/lister/entreprise", name="lister_contact_entreprise")
+     */
+    public function lister_contact_entreprise(Request $request)
+    {
+        $data=$request->getContent();
+        $data=json_decode($data,true);
+     
+        $contacts = $this->manager->getRepository(Contact::class)->findBy(array("id_entreprise"=>$data["id"]));
+        if ($contacts){
+            $contacts = $this->serializer->serialize($contacts,'json',['groups'=>'contact']);
+            return new JsonResponse($contacts,Response::HTTP_OK,[],true);
+        }else{
+            return new JsonResponse("Aucun contact dans cette entreprise pour le moment",Response::HTTP_OK,[],true);
+        }
+    }
+
+    /**
+     * @Route("/contact/supprimer", name="supprimer_contact")
      */
     public function supprimer_contact(Request $request)
     {
@@ -101,12 +122,10 @@ class ContactController extends AbstractController
             $this->manager->remove($new_contact);
 
             $this->manager->flush();
-            
-            
+
             return new JsonResponse("Contact supprimé",Response::HTTP_OK,[],'json');  
         }else{
             return new JsonResponse("Contact inexistant",Response::HTTP_OK,[],'json');
-        }
-         
+        }    
     }
 }

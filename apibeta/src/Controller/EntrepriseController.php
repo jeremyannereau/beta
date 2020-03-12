@@ -117,9 +117,7 @@ class EntrepriseController extends AbstractController
           ],true);           
       }   
     }
-    
-
-     /**
+    /**
      * @Route("/entreprise/edit", name="edit_entreprise")
      */
     public function edit_entreprise(Request $request, EntityManagerInterface $manager, SerializerInterface $serializer)
@@ -141,8 +139,6 @@ class EntrepriseController extends AbstractController
 
         return new JsonResponse("modifié",Response::HTTP_OK,[],'json');  
     }
-
-
 
     /**
      * @Route("/entreprise/consulter", name="consulter_entreprise")

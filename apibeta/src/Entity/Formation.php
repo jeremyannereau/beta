@@ -48,9 +48,13 @@ class Formation
      */
     private $date_fin;
 
+
+    
     public function __construct()
     {
         $this->id_user = new ArrayCollection();
+        $this->formationUsers = new ArrayCollection();
+       
     }
     public function setId(int $id): self
     {
@@ -149,4 +153,8 @@ class Formation
 
         return $this;
     }
+
+    
+
+    
 }

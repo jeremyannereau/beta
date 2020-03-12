@@ -74,6 +74,14 @@ class User implements UserInterface
      */
     private $statut;
 
+    
+
+   
+    public function __construct()
+    {
+        $this->formationUsers = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -220,4 +228,6 @@ class User implements UserInterface
 
         return $this;
     }
+
+    
 }

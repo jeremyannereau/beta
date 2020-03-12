@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Entity\Formation;
+use App\Controller\FormationController;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,11 +32,31 @@ class FormateurController extends AbstractController
         $this->encoder = $encoder;
     }
     /**
-     * @Route("/formateur/creer_groupe", name="creer_groupe")
+     * @Route("formateur/creer/formation", name="formateur_creer_formation")
      */
-    public function creer_groupe()
+    public function creer_formation(Request $request)
     {
-     
+        $token=$request->headers->get("X-AUTH-CONTENT");
+        
+        $user=$this->manager->getRepository(User::class)->findOneBy(array("token"=>$token));
+
+        if ($user){
+            $statut=$user->getStatut();
+            
+            if ($statut=="admin" | $statut=="formateur"){
+               
+                $controller = new FormationController($this->manager,$this->serializer,$this->validator,$this->encoder);
+
+                return $controller->creer_formation($request,$user);
+
+
+            }else{
+                return new JsonResponse("Vous n'avez pas les droits",Response::HTTP_UNAUTHORIZED,[],'json'); 
+            }
+        }else{
+            return new JsonResponse("Vous n'avez pas les droits",Response::HTTP_UNAUTHORIZED,[],'json');
+        }
+        
     }
 
     /**
