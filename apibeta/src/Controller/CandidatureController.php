@@ -37,7 +37,6 @@ class CandidatureController extends AbstractController
      */
     public function lister_candidature ()
     {
-
         $candidatures = $this->manager->getRepository(Candidature::class)->findAll();
         $candidatures = $this->serializer->serialize($candidatures,'json',['groups'=>'nomansland']);
         return new JsonResponse($candidatures,Response::HTTP_OK,[],true);

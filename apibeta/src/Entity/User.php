@@ -74,6 +74,11 @@ class User implements UserInterface
      */
     private $statut;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\FormationUsers", mappedBy="idUser")
+     */
+    private $formationUsers;
+
     
 
    
@@ -225,6 +230,34 @@ class User implements UserInterface
     public function setStatut(string $statut): self
     {
         $this->statut = $statut;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|FormationUsers[]
+     */
+    public function getFormationUsers(): Collection
+    {
+        return $this->formationUsers;
+    }
+
+    public function addFormationUser(FormationUsers $formationUser): self
+    {
+        if (!$this->formationUsers->contains($formationUser)) {
+            $this->formationUsers[] = $formationUser;
+            $formationUser->addIdUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormationUser(FormationUsers $formationUser): self
+    {
+        if ($this->formationUsers->contains($formationUser)) {
+            $this->formationUsers->removeElement($formationUser);
+            $formationUser->removeIdUser($this);
+        }
 
         return $this;
     }

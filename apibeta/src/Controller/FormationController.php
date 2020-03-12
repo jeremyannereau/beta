@@ -75,7 +75,9 @@ class FormationController extends AbstractController
             $this->manager->flush();
             
             if ($user){
-                $this->lier_formateur_formation($formation,$user);          
+                $this->lier_formateur_formation($formation,$user); 
+                return new JsonResponse("Formation ajoutée3",Response::HTTP_CREATED,[
+                ],true);         
             }
             return new JsonResponse("Formation ajoutée",Response::HTTP_CREATED,[
             ],true);            
@@ -90,7 +92,7 @@ class FormationController extends AbstractController
         $id_formation=$formation->getId();
         $id_user=$user->getId();
 
-        
+        dd($formation->addIdUser($user));
     }
 
 

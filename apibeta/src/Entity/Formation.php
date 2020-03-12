@@ -23,11 +23,7 @@ class Formation
      */
     private $nom;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="formations")
-     */
-    private $id_user;
-
+    
     /**
      * @ORM\Column(type="text", nullable=true)
      */
@@ -48,14 +44,18 @@ class Formation
      */
     private $date_fin;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\FormationUsers", mappedBy="idFormation")
+     */
+    private $formationUsers;
+
 
     
     public function __construct()
     {
-        $this->id_user = new ArrayCollection();
         $this->formationUsers = new ArrayCollection();
-       
     }
+
     public function setId(int $id): self
     {
         $this->id = $id;
@@ -80,32 +80,7 @@ class Formation
         return $this;
     }
 
-    /**
-     * @return Collection|User[]
-     */
-    public function getIdUser(): Collection
-    {
-        return $this->id_user;
-    }
-
-    public function addIdUser(User $idUser): self
-    {
-        if (!$this->id_user->contains($idUser)) {
-            $this->id_user[] = $idUser;
-        }
-
-        return $this;
-    }
-
-    public function removeIdUser(User $idUser): self
-    {
-        if ($this->id_user->contains($idUser)) {
-            $this->id_user->removeElement($idUser);
-        }
-
-        return $this;
-    }
-
+    
     public function getTags(): ?string
     {
         return $this->tags;
@@ -150,6 +125,34 @@ class Formation
     public function setDateFin(?\DateTimeInterface $date_fin): self
     {
         $this->date_fin = $date_fin;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|FormationUsers[]
+     */
+    public function getFormationUsers(): Collection
+    {
+        return $this->formationUsers;
+    }
+
+    public function addFormationUser(FormationUsers $formationUser): self
+    {
+        if (!$this->formationUsers->contains($formationUser)) {
+            $this->formationUsers[] = $formationUser;
+            $formationUser->addIdFormation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormationUser(FormationUsers $formationUser): self
+    {
+        if ($this->formationUsers->contains($formationUser)) {
+            $this->formationUsers->removeElement($formationUser);
+            $formationUser->removeIdFormation($this);
+        }
 
         return $this;
     }
