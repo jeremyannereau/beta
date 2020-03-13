@@ -80,6 +80,7 @@ class EntrepriseController extends AbstractController
      */
     public function rechercher_entreprise_criteres (EntityManagerInterface $manager, SerializerInterface $serializer, Request $request, EntrepriseRepository $repository){
         
+        
         $data=$request->getContent();
         $recherche = $serializer->deserialize($data,Entreprise::class,"json");
         

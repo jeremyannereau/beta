@@ -4,7 +4,12 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Formation;
+use App\Entity\FormationUsers;
+use App\Repository\FormationRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use JsonSerializable;
+use Normalizer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -13,13 +18,16 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
-class FormationController extends AbstractController
+class FormationController extends AbstractController implements JsonSerializable
 {
     protected $manager;
     protected $serializer;
     protected $validator;
     protected $encoder;
+    protected $normalizer;
 
     public function __construct(EntityManagerInterface $manager, SerializerInterface $serializer, ValidatorInterface $validator, UserPasswordEncoderInterface $encoder)
     { 
@@ -27,6 +35,8 @@ class FormationController extends AbstractController
         $this->serializer = $serializer;
         $this->validator = $validator;
         $this->encoder = $encoder;
+    
+
     }
     /**
      * @Route("/formation/lister", name="lister_formation")
@@ -42,25 +52,78 @@ class FormationController extends AbstractController
             
             if ($statut=="admin"){
                 $formation = $this->manager->getRepository(Formation::class)->findAll();
-                $formation = $this->serializer->serialize($formation,'json',[]);
+                $formation = $this->serializer->serialize($formation,'json',['groups'=>'simple']);
                 return new JsonResponse($formation,Response::HTTP_OK,[],true);
             }else if ($statut=="formateur"){
                 $formation = $this->manager->getRepository(Formation::class)->findBy(array(""));
-                $formation = $this->serializer->serialize($formation,'json',[]);
+                $formation = $this->serializer->serialize($formation,'json',['groups'=>'simple']);
                 return new JsonResponse($formation,Response::HTTP_OK,[],true);
             }else{
                 return new JsonResponse("Vous n'avez pas les droits1",Response::HTTP_UNAUTHORIZED,[],'json'); 
             }
         }else{
             return new JsonResponse("Vous n'avez pas les droits2",Response::HTTP_UNAUTHORIZED,[],'json');
-        }
+        }   
+    }
+
+    /**
+     * @Route("/formation/rechercher/criteres", name="rechercher_formation_criteres")
+     */
+    public function rechercher_formation_criteres (EntityManagerInterface $manager, SerializerInterface $serializer, Request $request, FormationRepository $repository){
+        
+            $data=$request->getContent();
+            $recherche = $this->serializer->deserialize($data,Formation::class,"json");
+            //dd($recherche);
+            $nom = $recherche->getNom();
+            
+            $tags= $recherche->getTags();
+        
+            
+            $formation = $repository->findBySelect($nom, $tags);
+            
+            $formation = $this->serializer->serialize($formation,'json',['groups'=>'simple']);
+            
+            return new JsonResponse(($formation),Response::HTTP_OK,[],true);
         
         
     }
+
+
+
+
+
+    /**
+     * @Route("/formation/lister/user", name="lister_formation_user")
+     */
+    public function lister_formation_user(Request $request)
+    { 
+        $token=$request->headers->get("X-AUTH-CONTENT");
+        $formation=$request->getContent();
+        $formation = json_decode($formation,true);
+        
+        $user=$this->manager->getRepository(User::class)->findOneBy(array("token"=>$token));
+        
+        
+        if ($user){
+            //dd($user);
+            $statut=$user->getStatut(); 
+            if ($statut=="admin"){
+                $formations=$this->manager->getRepository(Formation::class)->findAll();
+               // $formations=$this->objectToArray($formations);   
+                dd(($formations));
+                return new JsonResponse("",Response::HTTP_OK,[],true);
+            }else if ($statut=="formateur"){
+                $formation=$this->manager->getRepository(Formation::class)->findOneBy(array("id"=>$formation["id"]));
+                return new JsonResponse($formation,Response::HTTP_OK,[],true);
+            }else{
+            return new JsonResponse("Vous n'avez pas les droits2",Response::HTTP_UNAUTHORIZED,[],'json');
+        }
+    }
+}
     /**
      * @Route("/formation/creer", name="creer_formation")
      */
-    public function creer_formation(Request $request,$user)
+    public function creer_formation(Request $request,$user=null)
     { 
         $data=$request->getContent();
         $formation=$this->serializer->deserialize($data,Formation::class,"json");
@@ -75,7 +138,7 @@ class FormationController extends AbstractController
             $this->manager->flush();
             
             if ($user){
-                $this->lier_formateur_formation($formation,$user); 
+                $this->lier_formation($formation,$user); 
                 return new JsonResponse("Formation ajoutée3",Response::HTTP_CREATED,[
                 ],true);         
             }
@@ -83,19 +146,19 @@ class FormationController extends AbstractController
             ],true);            
         }
     }
-
     /**
      * @Route("/formation/lier/formateur", name="lier_formateur_formation")
      */
-    public function lier_formateur_formation($formation, $user)
+    public function lier_formation($formation, $user)
     {
-        $id_formation=$formation->getId();
-        $id_user=$user->getId();
-
-        dd($formation->addIdUser($user));
+        $entity = new FormationUsers();
+        $entity->addIdFormation($formation);
+        $entity->addIdUser($user);
+        $this->manager->persist($entity);
+        $this->manager->flush($entity);
+        return new JsonResponse("ok",Response::HTTP_OK,[],'json');
     }
-
-
+    
     /**
      * @Route("/formation/modifier", name="modifier_formation")
      */
@@ -116,13 +179,13 @@ class FormationController extends AbstractController
     /**
     * @Route("/formation/consulter", name="consulter_formation")
     */
-    public function consulter_formation()
+    public function consulter_formation(Request $request)
     {
-        $data = $this->request->getContent();
+        $data = $request->getContent();
         $formation = $this->serializer->deserialize($data,Formation::class,'json');
         $id=$formation->getId();
         $new_formation=$this->manager->getRepository(formation::class,'json')->findOneBy(array("id"=>$id));
-        $new_formation=$this->serializer->serialize($new_formation,'json',[]);
+        $new_formation=$this->serializer->serialize($new_formation,'json',['groups'=>'simple']);
 
         return new JsonResponse($new_formation,Response::HTTP_OK,[],'json');
     }
@@ -145,9 +208,15 @@ class FormationController extends AbstractController
             return new JsonResponse("Formation inexistante",Response::HTTP_OK,[],'json');
         }
     }
+    public function jsonSerialize()
+    {
+        
+    }
 
-    
-
-
+    function objectToArray ($object) {
+        if(!is_object($object) && !is_array($object))
+            return $object;
+        return array_map('objectToArray', (array) $object);
+    }
 }
 

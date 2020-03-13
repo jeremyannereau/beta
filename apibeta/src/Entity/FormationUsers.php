@@ -19,12 +19,12 @@ class FormationUsers
     private $id;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Formation", inversedBy="formationUsers")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Formation", inversedBy="formationUsers", cascade={"persist"})
      */
     private $idFormation;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="formationUsers")
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="formationUsers", cascade={"persist"})
      */
     private $idUser;
 

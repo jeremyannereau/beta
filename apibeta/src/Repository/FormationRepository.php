@@ -47,4 +47,24 @@ class FormationRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function findBySelect($nom=null,$tags=null)
+    {
+        $query = $this->createQueryBuilder('f');
+        if ($nom){
+            $query->andWhere('f.nom LIKE :nom')
+            ->setParameter('nom','%'. $nom .'%');
+
+        }
+        if ($tags){
+            $query->andWhere('f.tags LIKE :tags')
+            ->setParameter('tags','%'.$tags.'%' );
+
+        }
+        $query=$query->orderBy('f.id', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery();
+            $query = $query->getResult();
+        return $query;
+        
+    }
 }
